@@ -62,6 +62,10 @@ class OllamaClient:
         self.temperature = temperature
         self.num_ctx = num_ctx
         self.timeout = timeout
+        # qwen2.5 的 tools 模板偶发返回 content="" 且 tool_calls=null，
+        # 但 done_reason=stop、eval_count>0 —— 模型确实生成了 token，
+        # 却被 Ollama 的工具解析器整体丢弃。单独统计，评测报告如实披露。
+        self.empty_response_retries = 0
 
     # ---------------- 底层请求 ----------------
     def _post(self, path: str, payload: dict[str, Any]) -> dict[str, Any]:
@@ -133,14 +137,27 @@ class OllamaClient:
         if format_json:
             payload["format"] = "json"
 
-        data = self._post("/api/chat", payload)
-        message = data.get("message", {}) or {}
-        return LLMResponse(
-            content=message.get("content", "") or "",
-            tool_calls=self._parse_tool_calls(message.get("tool_calls") or []),
-            model=data.get("model", self.model),
-            raw=data,
-        )
+        # 空响应重试：这是后端解析抖动，不改变 payload / 温度 / 工具清单，
+        # 也不改任何评分口径；重试次数单独计数，避免把失败藏起来。
+        for attempt in range(3):
+            data = self._post("/api/chat", payload)
+            message = data.get("message", {}) or {}
+            content = message.get("content", "") or ""
+            tool_calls = self._parse_tool_calls(message.get("tool_calls") or [])
+            if content.strip() or tool_calls:
+                return LLMResponse(
+                    content=content,
+                    tool_calls=tool_calls,
+                    model=data.get("model", self.model),
+                    raw=data,
+                )
+            if attempt < 2:
+                self.empty_response_retries += 1
+                logger.warning(
+                    "Ollama 返回空响应（content 与 tool_calls 均为空），第 %d 次原样重试",
+                    attempt + 1,
+                )
+        return LLMResponse(content="", model=data.get("model", self.model), raw=data)
 
     @staticmethod
     def _parse_tool_calls(raw_calls: list[dict[str, Any]]) -> list[ToolCall]:

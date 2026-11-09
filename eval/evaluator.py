@@ -277,11 +277,12 @@ class EvalRunner:
         route_args = {k: self._expand(str(v), out_dir) for k, v in (task.get("route_args") or {}).items()}
 
         base_registry = ToolRegistry()
-        from tools import audio_tools, doc_tools, file_tools
+        from tools import audio_tools, doc_tools, file_tools, knowledge_tools
 
         base_registry.extend(file_tools.FILE_TOOLS)
         base_registry.extend(doc_tools.DOC_TOOLS)
         base_registry.extend(audio_tools.AUDIO_TOOLS)
+        base_registry.extend(knowledge_tools.KNOWLEDGE_TOOLS)
         registry = RecordingRegistry(base_registry)
         # 每条任务用独立通讯录 DB：跨轮复用 data/workspace/eval.sqlite3 会让
         # 评测结果依赖机器历史状态（旧库里曾残留过期域名/联系人，seed 因
@@ -378,6 +379,7 @@ class EvalRunner:
             "is_real_measurement": not self.is_mock,
             "model": getattr(self.raw_llm, "model", "unknown"),
             "host": getattr(self.raw_llm, "host", config.ollama_host),
+            "empty_response_retries": getattr(self.raw_llm, "empty_response_retries", 0),
             "platform": f"{platform.system()} {platform.release()} / Python {sys.version.split()[0]}",
             "include_unsupported": self.include_unsupported,
             "task_count": len(tasks),
@@ -467,12 +469,23 @@ def render_markdown(report: dict[str, Any]) -> str:
         lines += ["", "## 能力缺口归因", "", "以下任务依赖尚未实现的能力，计入未完成：", ""]
         for r in skipped:
             lines.append(f"- **{r['task_id']}**：{r['reason']}")
+        ceiling = (report["task_count"] - len(skipped)) / report["task_count"]
         lines += [
             "",
             f"> 当前能力上限：最多 {report['task_count'] - len(skipped)}/{report['task_count']} 条可完成"
-            f"（{(report['task_count'] - len(skipped)) / report['task_count']:.0%}）。"
-            "若该上限低于 70% 目标，补齐能力之前无论怎么调优模型都无法达标。",
+            f"（{ceiling:.0%}）。"
+            + ("该上限低于 70% 目标，补齐能力之前无论怎么调优模型都无法达标。"
+               if ceiling < 0.70 else
+               "该上限已高于 70% 目标；达标不等于能力齐备，剩余跳过项仍是明确缺口。"),
         ]
-    lines += ["", "## 环境备注", "", f"- 首 Token 探测：{report['ttft'].get('note', '')}",
-              f"- 内存采样：{report['memory'].get('note', '')}", ""]
+    lines += [
+        "", "## 环境备注", "",
+        f"- 首 Token 探测：{report['ttft'].get('note', '')}",
+        f"- 首 Token 全部样本：{report['ttft'].get('samples_ms', [])} ms"
+        "（中位数会掩盖冷启动离群值，故列出全部样本）",
+        f"- 内存采样：{report['memory'].get('note', '')}",
+        f"- 模型空响应重试：{report.get('empty_response_retries', 0)} 次"
+        "（qwen2.5 tools 模板偶发返回空 content 且 tool_calls 为空，客户端原样重试，payload 与评分口径不变）",
+        "",
+    ]
     return "\n".join(lines)

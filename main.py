@@ -18,7 +18,7 @@ from core.llm_client import OllamaClient
 from core.prompt_builder import build_system_prompt
 from core.tool_registry import ToolRegistry
 from memory.structured_db import StructuredMemory
-from tools import audio_tools, doc_tools, file_tools
+from tools import audio_tools, doc_tools, file_tools, knowledge_tools
 
 
 def build_registry() -> ToolRegistry:
@@ -26,6 +26,7 @@ def build_registry() -> ToolRegistry:
     registry.extend(file_tools.FILE_TOOLS)
     registry.extend(doc_tools.DOC_TOOLS)
     registry.extend(audio_tools.AUDIO_TOOLS)
+    registry.extend(knowledge_tools.KNOWLEDGE_TOOLS)
     return registry
 
 

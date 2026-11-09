@@ -15,8 +15,11 @@ from memory.structured_db import StructuredMemory
 
 NOTICE_PROMPT = """根据下面的会议要点，起草一份正式的会议通知邮件正文。
 
+收件部门：{group}
+
 要求：
 - 公文语气，简洁庄重，不用营销话术、不用感叹号。
+- 正文里必须明确写出收件部门「{group}」，不要只写「全体同事」这类泛称。
 - 包含：会议/事项背景、核心内容、对收件人的要求、时间节点。
 - 列出会议纪要和待办清单作为附件提示。
 - 落款用「办公室」，日期留「（日期）」占位。
@@ -34,6 +37,7 @@ class EmailDraft:
     subject: str = ""
     body: str = ""
     recipients: list[str] = field(default_factory=list)
+    group: str = ""
     path: str = ""
     errors: list[str] = field(default_factory=list)
 
@@ -53,7 +57,7 @@ class EmailAgent:
         return [f"{r['name']} <{r['email']}>" for r in rows]
 
     def compose(self, summary: str, todos: list[dict[str, str]], group: str = "全体成员") -> EmailDraft:
-        draft = EmailDraft(subject="关于部门例会纪要及待办事项落实的通知")
+        draft = EmailDraft(subject="关于部门例会纪要及待办事项落实的通知", group=group)
         draft.recipients = self.resolve_recipients(group)
         todo_text = "\n".join(
             f"- {t.get('who', '未指定')}：{t.get('what', '')}（{t.get('when', '未定期限')}）"
@@ -61,7 +65,7 @@ class EmailAgent:
         ) or "（无）"
         try:
             resp = self.llm.chat(
-                [{"role": "user", "content": NOTICE_PROMPT.format(summary=summary, todos=todo_text)}],
+                [{"role": "user", "content": NOTICE_PROMPT.format(summary=summary, todos=todo_text, group=group)}],
                 temperature=0.3,
             )
             draft.body = resp.content.strip()
@@ -71,6 +75,9 @@ class EmailAgent:
         return draft
 
     def save(self, draft: EmailDraft, out_path: str = "data/outbox/notices/会议通知.txt") -> EmailDraft:
+        # 具体部门才作为 department 落盘；「全体成员」这类泛称不写进收件人行
+        generic = {"", "全体成员", "全部门", "全体", "所有部门"}
+        department = "" if draft.group.strip() in generic else draft.group.strip()
         result = self.registry.dispatch(
             "write_notice_txt",
             {
@@ -78,6 +85,8 @@ class EmailAgent:
                 "subject": draft.subject,
                 "body": draft.body,
                 "recipients": "、".join(draft.recipients),
+                "department": department,
+                "signature": "办公室",
             },
         )
         if result.ok:

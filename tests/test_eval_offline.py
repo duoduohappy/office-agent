@@ -60,7 +60,14 @@ def test_benchmark_schema() -> None:
           str(set(bm["thresholds"])))
     check("简单任务耗时为平均耗时的子约束", "simple_elapsed_s_max" in bm["thresholds"])
     check("每条都有 grading", all("grading" in t for t in tasks))
-    check("复杂任务都标注能力依赖", all(t["requires"] for t in tasks if t["difficulty"] == "complex"))
+    complex_tasks = [t for t in tasks if t["difficulty"] == "complex"]
+    unlocked = {t["id"] for t in complex_tasks if not t["requires"]}
+    check("仅已落地本地检索的 C02/C05 解除能力依赖", unlocked == {"C02", "C05"}, str(unlocked))
+    check("其余 5 条复杂任务仍如实标注能力依赖",
+          len([t for t in complex_tasks if t["requires"]]) == 5)
+    check("解锁任务的能力描述标注了实现边界",
+          all("bigram" in t["capability"] and "非向量库" in t["capability"]
+              for t in complex_tasks if t["id"] in unlocked))
     check("简单/中等任务无能力依赖", all(not t["requires"] for t in tasks if t["difficulty"] != "complex"))
     check("route 合法", all(t["route"] in {"generic", "pipeline"} for t in tasks))
     check("pipeline 任务带 transcript", all(
@@ -68,13 +75,18 @@ def test_benchmark_schema() -> None:
         if t["route"] == "pipeline" and not t["requires"]
     ))
     reg = ToolRegistry().extend(doc_tools.DOC_TOOLS)
-    from tools import audio_tools, file_tools
+    from tools import audio_tools, file_tools, knowledge_tools
     reg.extend(file_tools.FILE_TOOLS).extend(audio_tools.AUDIO_TOOLS)
+    reg.extend(knowledge_tools.KNOWLEDGE_TOOLS)
     known = set(reg.names())
     orphan = {
         tool for t in tasks if not t["requires"] for tool in t["expected_tools"] if tool not in known
     }
     check("可执行任务的标准答案工具都已注册", not orphan, str(orphan))
+    # 防止「删掉 requires 假装能力已实现」：解锁任务必须真的能调到本地检索
+    check("解锁的复杂任务确有本地检索工具可用",
+          all("search_knowledge_base" in t["expected_tools"] for t in complex_tasks if t["id"] in unlocked)
+          and "search_knowledge_base" in known)
     check("占位符只引用已定义 fixture", all(
         "{fixture:" not in t["instruction"] or any(f"{{fixture:{n}}}" in t["instruction"] for n in
                                                   ("policy_doc", "sales_xlsx", "notice_pdf", "plain_txt",
@@ -187,15 +199,16 @@ def test_aggregate() -> None:
     s = aggregate(records, bm, ttft, memory)
     by_name = {m["name"]: m for m in s["metrics"]}
     check("7 项指标齐全", len(s["metrics"]) == 7)
-    check("完成率 = 13/20 = 0.65（能力上限）", by_name["任务完成率"]["value"] == 0.65,
+    check("完成率 = 15/20 = 0.75（补齐检索后的能力上限）", by_name["任务完成率"]["value"] == 0.75,
           str(by_name["任务完成率"]["value"]))
-    check("能力上限低于 70% 目标 → 判定 fail", by_name["任务完成率"]["status"] == "fail")
+    check("能力上限高于 70% 目标 → 理想情况下判 pass", by_name["任务完成率"]["status"] == "pass")
+    check("跳过条目仍按未完成计入分母，未被剔除", s["skipped"] == 5 and s["total_tasks"] == 20)
     check("工具准确率 1.0（标准答案完全命中）", by_name["工具调用准确率"]["value"] == 1.0)
     check("格式不可测时标 unavailable", by_name["格式正确率"]["status"] == "unavailable")
     check("平均步数 = 4", by_name["平均完成步数"]["value"] == 4)
     check("平均耗时 = 10s", by_name["平均耗时"]["value"] == 10)
     check("简单任务均值被记录", s["simple_avg_elapsed_s"] == 10)
-    check("跳过任务计入完成率分母", s["skipped"] == 7 and s["completed"] == 13)
+    check("跳过任务计入完成率分母", s["skipped"] == 5 and s["completed"] == 15)
     check("分母口径说明写进报告", any("分母为" in n for n in s["notes"]))
     check("全量评测被正确标记", s["is_full_benchmark"] is True and s["total_tasks"] == 20)
     subset = aggregate(records[:1], bm, ttft, memory, task_scope=1)
@@ -305,6 +318,70 @@ def test_report_no_absolute_paths() -> None:
     check("脱敏函数对非路径文本无副作用", scrub_local_paths("任务完成，共 3 步") == "任务完成，共 3 步")
 
 
+def test_p0_p1_fixes() -> None:
+    """P0/P1 修复的确定性回归：不依赖模型，锁住工程闭环行为。"""
+    from core.harness import AgentLoop
+    from core.llm_client import LLMResponse, ToolCall
+    from core.tool_registry import ToolRegistry
+    from tools import file_tools, knowledge_tools
+
+    out = ROOT / "tests" / "_tmp_out" / "p0p1"
+    shutil.rmtree(out, ignore_errors=True)
+    out.mkdir(parents=True, exist_ok=True)
+    rel = out.relative_to(ROOT).as_posix()
+
+    reg = ToolRegistry().extend(doc_tools.DOC_TOOLS).extend(file_tools.FILE_TOOLS)
+    reg.extend(knowledge_tools.KNOWLEDGE_TOOLS)
+
+    # --- P0-1 通知的格式契约：默认落款 + 部门名落盘 ---
+    r = reg.dispatch("write_notice_txt", {
+        "path": f"{rel}/通知.txt", "subject": "内部通知",
+        "body": "端侧推理，数据不出内网。", "recipients": "所有部门", "department": "技术科",
+    })
+    text = (out / "通知.txt").read_text(encoding="utf-8")
+    check("P0 通知工具默认补落款", r.ok and "办公室" in text, text)
+    check("P0 通知工具把收件部门写进文件", "技术科" in text, text)
+    r2 = reg.dispatch("write_notice_txt", {
+        "path": f"{rel}/通知2.txt", "subject": "内部通知",
+        "body": "正文。\n\n信息技术科\n（日期）", "signature": "信息技术科",
+    })
+    text2 = (out / "通知2.txt").read_text(encoding="utf-8")
+    check("P0 自定义落款不重复追加", r2.ok and text2.count("信息技术科") == 1, text2)
+
+    # --- P0-2 harness 写后回读：把真实落盘内容回灌给模型 ---
+    class FakeWriteLLM:
+        def __init__(self) -> None:
+            self.resps = [
+                LLMResponse(content="", tool_calls=[ToolCall(
+                    name="write_file",
+                    arguments={"path": f"{rel}/汇总.txt", "content": "合计 641.1 万元"},
+                )]),
+                LLMResponse(content="已写入"),
+            ]
+
+        def chat(self, messages, tools=None, **kwargs):
+            return self.resps.pop(0) if self.resps else LLMResponse(content="done")
+
+    verified = AgentLoop(FakeWriteLLM(), reg, max_steps=3).run("写汇总")
+    feeds = [m["content"] for m in verified.messages if m["role"] == "tool"]
+    check("P0 写后回读把真实内容回灌", any("WRITE_VERIFY" in f and "合计 641.1" in f for f in feeds))
+    check("P0 回读不新增工具调用（不污染工具准确率）", verified.tool_count == 1)
+    off = AgentLoop(FakeWriteLLM(), reg, max_steps=3, verify_writes=False).run("写汇总")
+    check("P0 verify_writes 可关闭",
+          not any("WRITE_VERIFY" in m["content"] for m in off.messages if m["role"] == "tool"))
+
+    # --- P1 本地检索：命中、来源标注、去重、能力边界 ---
+    hit = reg.dispatch("search_knowledge_base", {"query": "国产适配", "top_k": 3})
+    check("P1 本地检索命中真实素材", hit.ok and hit.meta.get("hits", 0) > 0, str(hit.meta))
+    check("P1 检索结果带来源文件路径", "来源：data/inbox" in hit.content, hit.content[:200])
+    check("P1 检索结果要求引用标注", "引用出处" in hit.content)
+    check("P1 检索不返回绝对路径", str(ROOT) not in hit.content)
+    check("P1 日期线索不误匹配版本号", "时间线索：5-7" not in hit.content)
+    miss = reg.dispatch("search_knowledge_base", {"query": ""})
+    check("P1 空检索词明确报错", not miss.ok, str(miss.error))
+    check("P1 工具已注册到评测器可见清单", "search_knowledge_base" in reg.names())
+
+
 def main() -> int:
     test_benchmark_schema()
     test_fixtures()
@@ -316,6 +393,7 @@ def main() -> int:
     test_process_name_matching()
     test_runner_guards()
     test_report_no_absolute_paths()
+    test_p0_p1_fixes()
     print(f"\n{'=' * 46}\n通过 {PASS} / 失败 {FAIL} / 共 {PASS + FAIL}")
     return 1 if FAIL else 0
 

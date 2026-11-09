@@ -5,7 +5,10 @@
     "占位符 {fixture:NAME} 由 fixtures.ensure_fixtures() 替换为绝对路径，{outdir} 替换为本次任务独立输出目录。",
     "评分采用确定性规则，不使用 LLM-as-judge：端侧只有 7B，让被测模型自评不可信、也不可复现。",
     "requires 非空表示依赖尚未实现的能力。这类任务默认跳过并计入任务完成率分母（未完成），但不计入工具准确率/格式正确率/步数/耗时分母，避免摊薄指标。",
-    "工具名全部取自 core/tool_registry.py 已注册工具；复杂任务的 expectations 是方案设定的理想答案，仅作差距参考。"
+    "工具名全部取自 core/tool_registry.py 已注册工具；复杂任务的 expectations 是方案设定的理想答案，仅作差距参考。",
+    "C02/C05 的检索能力由 tools/knowledge_tools.py 落地：纯标准库中文 bigram 倒排 + 片段级 BM25 打分，返回带来源路径的证据片段。这是本地关键词检索，不是向量库/语义 RAG，也未接入结构化 citation 链；因此 requires 仅解除 rag/citation/vector_store 三个标签中最基础的字面检索部分，能力边界见各任务 capability 字段。",
+    "本轮未修改任何 grading 规则、阈值或关键字；M02/M04/M08 的修复全部发生在产品代码层（写后回读校验、通知格式契约、收件部门透传）。",
+    "C02 原指令「根据这份政策文件」无指代对象（route_args 为空、无 fixture 占位符），7B 只能反问用户要路径；本轮补上 {fixture:policy_doc} 占位符使任务自包含。这是修正任务定义缺陷，未改动其 grading 规则、关键字或阈值。"
   ],
   "thresholds": {
     "task_completion_rate": 0.70,
@@ -263,11 +266,11 @@
     {
       "id": "C02",
       "difficulty": "complex",
-      "capability": "多 Agent 协作 / RAG 检索 + 引用溯源",
-      "instruction": "根据这份政策文件，在知识库中找相关材料，写一份汇报提纲并标注引用出处。",
+      "capability": "本地关键词检索 + 来源标注（bigram/BM25，非向量库语义 RAG，无结构化 citation 链）",
+      "instruction": "根据 {fixture:policy_doc} 这份政策文件，在知识库中找相关材料，写一份汇报提纲并标注引用出处。",
       "route": "generic",
       "route_args": {},
-      "requires": ["rag", "citation"],
+      "requires": [],
       "expected_tools": ["read_document", "search_knowledge_base", "write_file"],
       "grading": {
         "answer_keywords": ["引用", "出处"],
@@ -311,11 +314,11 @@
     {
       "id": "C05",
       "difficulty": "complex",
-      "capability": "多 Agent 协作 / 跨文档语义检索 + 去重",
+      "capability": "本地跨文档关键词检索 + 片段去重（bigram/BM25，非向量库语义检索，时间排序依赖片段内日期线索）",
       "instruction": "在 data/inbox 全部文档中检索与「国产适配」相关的段落，去重后按时间排序输出并标注来源文件。",
       "route": "generic",
       "route_args": {},
-      "requires": ["rag", "vector_store"],
+      "requires": [],
       "expected_tools": ["search_knowledge_base", "write_file"],
       "grading": {
         "answer_keywords": ["来源", "适配"],

@@ -1,0 +1,953 @@
+{
+  "run_id": "eval_20261109_192019",
+  "timestamp": "2026-11-09T19:27:44",
+  "is_real_measurement": true,
+  "model": "qwen2.5:7b-instruct-q4_K_M",
+  "host": "http://127.0.0.1:11434",
+  "empty_response_retries": 2,
+  "platform": "Windows 11 / Python 3.13.14",
+  "include_unsupported": false,
+  "task_count": 20,
+  "is_full_benchmark": true,
+  "out_root": "data/outbox/eval_20261109_192019",
+  "records": [
+    {
+      "task_id": "S01",
+      "difficulty": "simple",
+      "status": "completed",
+      "reason": "",
+      "completed": true,
+      "elapsed_s": 18.55,
+      "llm_calls": 2,
+      "tool_calls": [
+        "read_document"
+      ],
+      "expected_tools": [
+        "read_document"
+      ],
+      "answer_preview": "文件《关于推进端侧智能办公应用建设的通知》的核心要点如下：\n1. 所有涉及内部资料的处理必须在本机完成，禁止调用境外云端大模型接口。\n2. 采用 7B 量化模型 Qwen2.5-7B Q4_K_M 在本地推理，配合多智能体协作完成文档处理、会议纪要与邮件起草。\n3. 邮件发送、文件删除等有副作用的操作须经人工确认，系统仅生成草稿。\n4. 进度安排：11 月 30 日前完成功能冻结，12 月 15 日前完成国产 CPU 与麒麟操作系统适配验证。\n\n文件路径：data/outbox/summary.txt",
+      "artifacts": [
+        "data/outbox/eval_20261109_192019/S01/eval.sqlite3"
+      ],
+      "checks": [
+        {
+          "rule": "回答关键字",
+          "ok": true,
+          "detail": "命中 ['端侧', 'Qwen2.5']/['端侧', '内网', 'Qwen2.5']（mode=any）"
+        },
+        {
+          "rule": "回答长度 ≥40",
+          "ok": true,
+          "detail": "实际 253"
+        }
+      ],
+      "format_ok": 0,
+      "format_total": 0
+    },
+    {
+      "task_id": "S02",
+      "difficulty": "simple",
+      "status": "completed",
+      "reason": "",
+      "completed": true,
+      "elapsed_s": 4.27,
+      "llm_calls": 2,
+      "tool_calls": [
+        "list_dir"
+      ],
+      "expected_tools": [
+        "list_dir"
+      ],
+      "answer_preview": "data/inbox/eval_fixtures 目录下的文件名如下：\n- internal_notice.pdf\n- meeting_long.txt\n- meeting_short.txt\n- notice_source.txt\n- policy_doc.docx\n- sales_2026_10.xlsx",
+      "artifacts": [
+        "data/outbox/eval_20261109_192019/S02/eval.sqlite3"
+      ],
+      "checks": [
+        {
+          "rule": "回答关键字",
+          "ok": true,
+          "detail": "命中 ['policy_doc.docx', 'sales_2026_10.xlsx', 'meeting_short.txt']/['policy_doc.docx', 'sales_2026_10.xlsx', 'meeting_short.txt']（mode=any）"
+        },
+        {
+          "rule": "回答长度 ≥15",
+          "ok": true,
+          "detail": "实际 155"
+        }
+      ],
+      "format_ok": 0,
+      "format_total": 0
+    },
+    {
+      "task_id": "S03",
+      "difficulty": "simple",
+      "status": "completed",
+      "reason": "",
+      "completed": true,
+      "elapsed_s": 6.07,
+      "llm_calls": 2,
+      "tool_calls": [
+        "read_file"
+      ],
+      "expected_tools": [
+        "read_file"
+      ],
+      "answer_preview": "文件 `data\\inbox\\eval_fixtures\\notice_source.txt` 列出了以下几条要求：\n1. 端侧推理，数据不出内网。\n2. 邮件只生成草稿，发送须人工确认。\n3. 11月30日前功能冻结。",
+      "artifacts": [
+        "data/outbox/eval_20261109_192019/S03/eval.sqlite3"
+      ],
+      "checks": [
+        {
+          "rule": "回答关键字",
+          "ok": true,
+          "detail": "命中 ['草稿', '确认', '内网']/['草稿', '确认', '内网']（mode=any）"
+        },
+        {
+          "rule": "回答长度 ≥30",
+          "ok": true,
+          "detail": "实际 135"
+        }
+      ],
+      "format_ok": 0,
+      "format_total": 0
+    },
+    {
+      "task_id": "S04",
+      "difficulty": "simple",
+      "status": "completed",
+      "reason": "",
+      "completed": true,
+      "elapsed_s": 11.21,
+      "llm_calls": 2,
+      "tool_calls": [
+        "read_document"
+      ],
+      "expected_tools": [
+        "read_document"
+      ],
+      "answer_preview": "根据提供的 Excel 文件内容，10 月销售额最高的部门是技术科，销售额为 342 万元。合计销售额为 641.1 万元。\n\n以下是文件中的数据概览：\n- 综合办：10月销售额 128.5 万元\n- 技术科：10月销售额 342 万元\n- 财务科：10月销售额 96.4 万元\n- 后勤处：10月销售额 74.2 万元\n- 合计：10月销售额 641.1 万元\n\n产出文件路径：无（数据直接在回答中给出，未生成新文件）",
+      "artifacts": [
+        "data/outbox/eval_20261109_192019/S04/eval.sqlite3"
+      ],
+      "checks": [
+        {
+          "rule": "回答关键字",
+          "ok": true,
+          "detail": "命中 ['技术科', '641.1', '342']/['技术科', '641.1', '342']（mode=any）"
+        },
+        {
+          "rule": "回答长度 ≥25",
+          "ok": true,
+          "detail": "实际 210"
+        }
+      ],
+      "format_ok": 0,
+      "format_total": 0
+    },
+    {
+      "task_id": "S05",
+      "difficulty": "simple",
+      "status": "completed",
+      "reason": "",
+      "completed": true,
+      "elapsed_s": 7.15,
+      "llm_calls": 2,
+      "tool_calls": [
+        "read_document"
+      ],
+      "expected_tools": [
+        "read_document"
+      ],
+      "answer_preview": "这份内部通知的主要内容是关于 Endpoint AI Office Agent 的使用限制。通知指出，所有数据不得离开公司内部网络。所使用的模型为 Qwen2.5-7B Q4_K_M，该模型仅在本地PC的CPU上运行。该通知的发布单位是信息技术办公室，编号为2026-11。\n\n文件路径：data/inbox/eval_fixtures/internal_notice.pdf\n\n产出文件路径：无（仅概括内容）",
+      "artifacts": [
+        "data/outbox/eval_20261109_192019/S05/eval.sqlite3"
+      ],
+      "checks": [
+        {
+          "rule": "回答关键字",
+          "ok": true,
+          "detail": "命中 ['本地', 'Qwen2.5', 'Endpoint']/['本地', '内网', 'Qwen2.5', 'Endpoint']（mode=any）"
+        },
+        {
+          "rule": "回答长度 ≥30",
+          "ok": true,
+          "detail": "实际 205"
+        }
+      ],
+      "format_ok": 0,
+      "format_total": 0
+    },
+    {
+      "task_id": "M01",
+      "difficulty": "medium",
+      "status": "completed",
+      "reason": "",
+      "completed": true,
+      "elapsed_s": 49.64,
+      "llm_calls": 4,
+      "tool_calls": [
+        "read_document",
+        "write_minutes_docx",
+        "write_todos_xlsx",
+        "write_notice_txt"
+      ],
+      "expected_tools": [
+        "read_document",
+        "write_minutes_docx",
+        "write_todos_xlsx",
+        "write_notice_txt"
+      ],
+      "answer_preview": "任务：把「会议录音转写稿」整理成纪要，提取待办，起草会议通知\n计划：1/5 步完成\n会议处理：1 片段，单段直出，2 条待办\n产出：data\\outbox\\eval_20261109_192019\\M01\\会议纪要.docx、data\\outbox\\eval_20261109_192019\\M01\\待办清单.xlsx、data\\outbox\\eval_20261109_192019\\M01\\notices\\会议通知.txt\n校验通过（0 项）\n校",
+      "artifacts": [
+        "data/outbox/eval_20261109_192019/M01/eval.sqlite3",
+        "data/outbox/eval_20261109_192019/M01/notices/会议通知.txt",
+        "data/outbox/eval_20261109_192019/M01/会议纪要.docx",
+        "data/outbox/eval_20261109_192019/M01/待办清单.xlsx"
+      ],
+      "checks": [
+        {
+          "rule": "产出 .docx 存在",
+          "ok": true,
+          "detail": "1 个"
+        },
+        {
+          "rule": "文件体积",
+          "ok": true,
+          "detail": "37675 bytes"
+        },
+        {
+          "rule": "文件内容关键字",
+          "ok": true,
+          "detail": "命中 ['会议主要内容', '待办']/['会议主要内容', '待办']（mode=all）"
+        },
+        {
+          "rule": "页边距 3.7/3.5/2.8/2.6cm",
+          "ok": true,
+          "detail": "[3.7, 3.5, 2.8, 2.6]"
+        },
+        {
+          "rule": "标题二号(22pt)小标宋",
+          "ok": true,
+          "detail": "22.0pt / 方正小标宋简体"
+        },
+        {
+          "rule": "正文三号(16pt)仿宋",
+          "ok": true,
+          "detail": "10 个 16pt run"
+        },
+        {
+          "rule": "正文行距 28 磅",
+          "ok": true
+        },
+        {
+          "rule": "含「一、会议主要内容」章节",
+          "ok": true
+        },
+        {
+          "rule": "产出 .xlsx 存在",
+          "ok": true,
+          "detail": "1 个"
+        },
+        {
+          "rule": "文件体积",
+          "ok": true,
+          "detail": "5241 bytes"
+        },
+        {
+          "rule": "文件内容关键字",
+          "ok": true,
+          "detail": "命中 ['责任人', '完成时限']/['责任人', '完成时限']（mode=all）"
+        },
+        {
+          "rule": "表头符合待办清单模板",
+          "ok": true,
+          "detail": "['序号', '责任人', '事项', '完成时限', '状态']"
+        },
+        {
+          "rule": "至少 1 行数据",
+          "ok": true,
+          "detail": "max_row=3"
+        }
+      ],
+      "format_ok": 2,
+      "format_total": 2
+    },
+    {
+      "task_id": "M02",
+      "difficulty": "medium",
+      "status": "completed",
+      "reason": "",
+      "completed": true,
+      "elapsed_s": 19.64,
+      "llm_calls": 3,
+      "tool_calls": [
+        "read_document",
+        "write_file"
+      ],
+      "expected_tools": [
+        "read_document",
+        "write_file"
+      ],
+      "answer_preview": "已经生成了汇总文件 `data/outbox/eval_20261109_192019/M02/销售汇总.txt`，文件内容如下：\n\n```\n部门\t10月销售额(万元)\n综合办\t128.5\n技术科\t342\n财务科\t96.4\n后勤处\t74.2\n合计\t641.1\n```\n\n文件中确实包含了部门、10月销售额（万元）以及合计总额 641.1 万元。",
+      "artifacts": [
+        "data/outbox/eval_20261109_192019/M02/eval.sqlite3",
+        "data/outbox/eval_20261109_192019/M02/销售汇总.txt"
+      ],
+      "checks": [
+        {
+          "rule": "回答关键字",
+          "ok": true,
+          "detail": "命中 ['641.1', '合计', '技术科']/['641.1', '合计', '技术科']（mode=any）"
+        },
+        {
+          "rule": "回答长度 ≥20",
+          "ok": true,
+          "detail": "实际 172"
+        },
+        {
+          "rule": "产出 .txt 存在",
+          "ok": true,
+          "detail": "1 个"
+        },
+        {
+          "rule": "文件体积",
+          "ok": true,
+          "detail": "107 bytes"
+        },
+        {
+          "rule": "文件内容关键字",
+          "ok": true,
+          "detail": "命中 ['技术科', '合计']/['技术科', '合计']（mode=all）"
+        }
+      ],
+      "format_ok": 0,
+      "format_total": 0
+    },
+    {
+      "task_id": "M03",
+      "difficulty": "medium",
+      "status": "completed",
+      "reason": "工具失败：read_file",
+      "completed": true,
+      "elapsed_s": 27.45,
+      "llm_calls": 4,
+      "tool_calls": [
+        "read_file",
+        "read_file",
+        "write_todos_xlsx"
+      ],
+      "expected_tools": [
+        "read_document",
+        "write_todos_xlsx"
+      ],
+      "answer_preview": "待办事项已成功生成至 Excel 文件 `data/outbox/eval_20261109_192019/M03/待办清单.xlsx`，文件中包含 2 条待办事项。\n\n以下是待办事项清单：\n1. 李娜：纪要模板复核\n2. 王强：工具注册表单元测试\n\n文件路径：`data/outbox/eval_20261109_192019/M03/待办清单.xlsx`。",
+      "artifacts": [
+        "data/outbox/eval_20261109_192019/M03/eval.sqlite3",
+        "data/outbox/eval_20261109_192019/M03/待办清单.xlsx"
+      ],
+      "checks": [
+        {
+          "rule": "产出 .xlsx 存在",
+          "ok": true,
+          "detail": "1 个"
+        },
+        {
+          "rule": "文件体积",
+          "ok": true,
+          "detail": "5232 bytes"
+        },
+        {
+          "rule": "文件内容关键字",
+          "ok": true,
+          "detail": "命中 ['责任人', '完成时限']/['责任人', '完成时限']（mode=all）"
+        },
+        {
+          "rule": "表头符合待办清单模板",
+          "ok": true,
+          "detail": "['序号', '责任人', '事项', '完成时限', '状态']"
+        },
+        {
+          "rule": "至少 1 行数据",
+          "ok": true,
+          "detail": "max_row=3"
+        }
+      ],
+      "format_ok": 1,
+      "format_total": 1
+    },
+    {
+      "task_id": "M04",
+      "difficulty": "medium",
+      "status": "completed",
+      "reason": "工具失败：read_file",
+      "completed": true,
+      "elapsed_s": 41.36,
+      "llm_calls": 5,
+      "tool_calls": [
+        "read_file",
+        "read_file",
+        "write_notice_txt"
+      ],
+      "expected_tools": [
+        "read_file",
+        "write_notice_txt"
+      ],
+      "answer_preview": "内部通知已成功起草并保存至 `data/outbox/eval_20261109_192019/M04/内部通知.txt`。以下是文件内容：\n\n---\n主题：内部通知\n收件人：办公室\n\n内部通知草稿素材\n1. 端侧推理，数据不出内网。\n2. 邮件只生成草稿，发送须人工确认。\n3. 11月30日前功能冻结。\n\n办公室\n（日期）\n\n---\n\n结论：文件已按要求生成，包含主题、收件人、通知内容和落款单位。",
+      "artifacts": [
+        "data/outbox/eval_20261109_192019/M04/eval.sqlite3",
+        "data/outbox/eval_20261109_192019/M04/内部通知.txt"
+      ],
+      "checks": [
+        {
+          "rule": "产出 .txt 存在",
+          "ok": true,
+          "detail": "1 个"
+        },
+        {
+          "rule": "文件体积",
+          "ok": true,
+          "detail": "228 bytes"
+        },
+        {
+          "rule": "文件内容关键字",
+          "ok": true,
+          "detail": "命中 ['办公室', '通知']/['办公室', '通知']（mode=all）"
+        }
+      ],
+      "format_ok": 0,
+      "format_total": 0
+    },
+    {
+      "task_id": "M05",
+      "difficulty": "medium",
+      "status": "completed",
+      "reason": "",
+      "completed": true,
+      "elapsed_s": 32.1,
+      "llm_calls": 4,
+      "tool_calls": [
+        "read_document",
+        "read_document",
+        "write_notice_txt"
+      ],
+      "expected_tools": [
+        "read_document",
+        "read_document",
+        "write_file"
+      ],
+      "answer_preview": "结论已写入文件 `data/outbox/eval_20261109_192019/M05/对照说明.txt`，文件内容如下：\n\n---\n主题：关于政策文件与销售数据时间节点对照说明\n收件人：办公室：技术科,财务科,后勤处\n\n政策文件《关于推进端侧智能办公应用建设的通知》中提到的进度安排与销售数据的时间节点存在直接对应关系。政策文件中提到的功能冻结进度安排截止日期为 2026 年 11 月 30 日，而销售数据截至 2026 年 10 月。\n\n办公室\n（日期）\n\n---\n\n文件中包含的主题、收件人、落款单位与日期等信息均与实际内容一致。",
+      "artifacts": [
+        "data/outbox/eval_20261109_192019/M05/eval.sqlite3",
+        "data/outbox/eval_20261109_192019/M05/对照说明.txt"
+      ],
+      "checks": [
+        {
+          "rule": "回答关键字",
+          "ok": true,
+          "detail": "命中 ['2026']/['11月30日', '10月', '2026']（mode=any）"
+        },
+        {
+          "rule": "回答长度 ≥20",
+          "ok": true,
+          "detail": "实际 271"
+        },
+        {
+          "rule": "产出 .txt 存在",
+          "ok": true,
+          "detail": "1 个"
+        },
+        {
+          "rule": "文件体积",
+          "ok": true,
+          "detail": "433 bytes"
+        }
+      ],
+      "format_ok": 0,
+      "format_total": 0
+    },
+    {
+      "task_id": "M06",
+      "difficulty": "medium",
+      "status": "completed",
+      "reason": "",
+      "completed": true,
+      "elapsed_s": 14.09,
+      "llm_calls": 2,
+      "tool_calls": [
+        "read_document",
+        "write_minutes_docx"
+      ],
+      "expected_tools": [
+        "read_document",
+        "write_minutes_docx"
+      ],
+      "answer_preview": "会议纪要已根据政策文档内容整理完成，并按照政务公文格式生成。会议纪要文件保存在 `data/outbox/eval_20261109_192019/M06/会议纪要.docx`。文件中未包含待办事项。\n\n产出文件路径：\n- 会议纪要：`data/outbox/eval_20261109_192019/M06/会议纪要.docx`",
+      "artifacts": [
+        "data/outbox/eval_20261109_192019/M06/eval.sqlite3",
+        "data/outbox/eval_20261109_192019/M06/会议纪要.docx"
+      ],
+      "checks": [
+        {
+          "rule": "产出 .docx 存在",
+          "ok": true,
+          "detail": "1 个"
+        },
+        {
+          "rule": "文件体积",
+          "ok": true,
+          "detail": "37042 bytes"
+        },
+        {
+          "rule": "文件内容关键字",
+          "ok": true,
+          "detail": "命中 ['端侧智能办公', '会议主要内容']/['端侧智能办公', '会议主要内容']（mode=all）"
+        },
+        {
+          "rule": "页边距 3.7/3.5/2.8/2.6cm",
+          "ok": true,
+          "detail": "[3.7, 3.5, 2.8, 2.6]"
+        },
+        {
+          "rule": "标题二号(22pt)小标宋",
+          "ok": true,
+          "detail": "22.0pt / 方正小标宋简体"
+        },
+        {
+          "rule": "正文三号(16pt)仿宋",
+          "ok": true,
+          "detail": "6 个 16pt run"
+        },
+        {
+          "rule": "正文行距 28 磅",
+          "ok": true
+        },
+        {
+          "rule": "含「一、会议主要内容」章节",
+          "ok": true
+        }
+      ],
+      "format_ok": 1,
+      "format_total": 1
+    },
+    {
+      "task_id": "M07",
+      "difficulty": "medium",
+      "status": "completed",
+      "reason": "",
+      "completed": true,
+      "elapsed_s": 89.51,
+      "llm_calls": 6,
+      "tool_calls": [
+        "read_document",
+        "write_minutes_docx",
+        "write_todos_xlsx",
+        "write_notice_txt"
+      ],
+      "expected_tools": [
+        "read_document",
+        "write_minutes_docx",
+        "write_todos_xlsx",
+        "write_notice_txt"
+      ],
+      "answer_preview": "任务：把「会议录音转写稿」整理成纪要，提取待办，起草会议通知\n计划：2/5 步完成\n会议处理：2 片段，Map-Reduce，7 条待办\n产出：data\\outbox\\eval_20261109_192019\\M07\\会议纪要.docx、data\\outbox\\eval_20261109_192019\\M07\\待办清单.xlsx、data\\outbox\\eval_20261109_192019\\M07\\notices\\会议通知.txt\n校验通过（",
+      "artifacts": [
+        "data/outbox/eval_20261109_192019/M07/eval.sqlite3",
+        "data/outbox/eval_20261109_192019/M07/notices/会议通知.txt",
+        "data/outbox/eval_20261109_192019/M07/会议纪要.docx",
+        "data/outbox/eval_20261109_192019/M07/待办清单.xlsx"
+      ],
+      "checks": [
+        {
+          "rule": "产出 .docx 存在",
+          "ok": true,
+          "detail": "1 个"
+        },
+        {
+          "rule": "文件体积",
+          "ok": true,
+          "detail": "38085 bytes"
+        },
+        {
+          "rule": "文件内容关键字",
+          "ok": true,
+          "detail": "命中 ['会议主要内容']/['会议主要内容']（mode=all）"
+        },
+        {
+          "rule": "页边距 3.7/3.5/2.8/2.6cm",
+          "ok": true,
+          "detail": "[3.7, 3.5, 2.8, 2.6]"
+        },
+        {
+          "rule": "标题二号(22pt)小标宋",
+          "ok": true,
+          "detail": "22.0pt / 方正小标宋简体"
+        },
+        {
+          "rule": "正文三号(16pt)仿宋",
+          "ok": true,
+          "detail": "12 个 16pt run"
+        },
+        {
+          "rule": "正文行距 28 磅",
+          "ok": true
+        },
+        {
+          "rule": "含「一、会议主要内容」章节",
+          "ok": true
+        },
+        {
+          "rule": "产出 .xlsx 存在",
+          "ok": true,
+          "detail": "1 个"
+        },
+        {
+          "rule": "文件体积",
+          "ok": true,
+          "detail": "5621 bytes"
+        },
+        {
+          "rule": "文件内容关键字",
+          "ok": true,
+          "detail": "命中 ['责任人']/['责任人']（mode=all）"
+        },
+        {
+          "rule": "表头符合待办清单模板",
+          "ok": true,
+          "detail": "['序号', '责任人', '事项', '完成时限', '状态']"
+        },
+        {
+          "rule": "至少 1 行数据",
+          "ok": true,
+          "detail": "max_row=8"
+        }
+      ],
+      "format_ok": 2,
+      "format_total": 2
+    },
+    {
+      "task_id": "M08",
+      "difficulty": "medium",
+      "status": "completed",
+      "reason": "",
+      "completed": true,
+      "elapsed_s": 47.61,
+      "llm_calls": 4,
+      "tool_calls": [
+        "read_document",
+        "write_minutes_docx",
+        "write_todos_xlsx",
+        "write_notice_txt"
+      ],
+      "expected_tools": [
+        "read_document",
+        "write_minutes_docx",
+        "write_todos_xlsx",
+        "write_notice_txt"
+      ],
+      "answer_preview": "任务：把「会议录音转写稿」整理成纪要，提取待办，起草会议通知\n计划：1/5 步完成\n会议处理：1 片段，单段直出，2 条待办\n产出：data\\outbox\\eval_20261109_192019\\M08\\会议纪要.docx、data\\outbox\\eval_20261109_192019\\M08\\待办清单.xlsx、data\\outbox\\eval_20261109_192019\\M08\\notices\\会议通知.txt\n校验通过（0 项）\n校",
+      "artifacts": [
+        "data/outbox/eval_20261109_192019/M08/eval.sqlite3",
+        "data/outbox/eval_20261109_192019/M08/notices/会议通知.txt",
+        "data/outbox/eval_20261109_192019/M08/会议纪要.docx",
+        "data/outbox/eval_20261109_192019/M08/待办清单.xlsx"
+      ],
+      "checks": [
+        {
+          "rule": "产出 .txt 存在",
+          "ok": true,
+          "detail": "1 个"
+        },
+        {
+          "rule": "文件体积",
+          "ok": true,
+          "detail": "1573 bytes"
+        },
+        {
+          "rule": "文件内容关键字",
+          "ok": true,
+          "detail": "命中 ['技术科', '王强']/['技术科', '王强']（mode=all）"
+        }
+      ],
+      "format_ok": 0,
+      "format_total": 0
+    },
+    {
+      "task_id": "C01",
+      "difficulty": "complex",
+      "status": "skipped",
+      "reason": "依赖未实现能力：asr、email_send、gui",
+      "completed": false,
+      "elapsed_s": 0.0,
+      "llm_calls": 0,
+      "tool_calls": [],
+      "expected_tools": [
+        "transcribe_audio",
+        "write_minutes_docx",
+        "write_todos_xlsx",
+        "write_notice_txt",
+        "send_email"
+      ],
+      "answer_preview": "",
+      "artifacts": [],
+      "checks": [],
+      "format_ok": 0,
+      "format_total": 0
+    },
+    {
+      "task_id": "C02",
+      "difficulty": "complex",
+      "status": "completed",
+      "reason": "",
+      "completed": true,
+      "elapsed_s": 41.03,
+      "llm_calls": 2,
+      "tool_calls": [
+        "read_document",
+        "search_knowledge_base"
+      ],
+      "expected_tools": [
+        "read_document",
+        "search_knowledge_base",
+        "write_file"
+      ],
+      "answer_preview": "根据政策文件《关于推进端侧智能办公应用建设的通知》及相关会议记录，现起草一份汇报提纲。提纲中引用了相关材料，具体如下：\n\n1. **总体要求**：所有涉及内部资料的处理必须在本机完成，禁止调用境外云端大模型接口。（来源：data/inbox/eval_fixtures/policy_doc.docx）\n\n2. **技术路线**：采用 7B 量化模型 Qwen2.5-7B Q4_K_M 在本地推理，配合多智能体协作完成文档处理、会议纪要与邮件起草。（来源：data/inbox/eval_fixtures/policy_doc.docx）\n\n3. **安全边界**：邮件发送、文件删除等有副作用的操",
+      "artifacts": [
+        "data/outbox/eval_20261109_192019/C02/eval.sqlite3"
+      ],
+      "checks": [
+        {
+          "rule": "回答关键字",
+          "ok": true,
+          "detail": "命中 ['引用', '出处']/['引用', '出处']（mode=all）"
+        },
+        {
+          "rule": "回答长度 ≥200",
+          "ok": true,
+          "detail": "实际 1284"
+        }
+      ],
+      "format_ok": 0,
+      "format_total": 0
+    },
+    {
+      "task_id": "C03",
+      "difficulty": "complex",
+      "status": "skipped",
+      "reason": "依赖未实现能力：asr、email_send、gui",
+      "completed": false,
+      "elapsed_s": 0.0,
+      "llm_calls": 0,
+      "tool_calls": [],
+      "expected_tools": [
+        "transcribe_audio",
+        "write_minutes_docx",
+        "write_todos_xlsx",
+        "write_notice_txt",
+        "send_email"
+      ],
+      "answer_preview": "",
+      "artifacts": [],
+      "checks": [],
+      "format_ok": 0,
+      "format_total": 0
+    },
+    {
+      "task_id": "C04",
+      "difficulty": "complex",
+      "status": "skipped",
+      "reason": "依赖未实现能力：chart_gen、pptx_gen",
+      "completed": false,
+      "elapsed_s": 0.0,
+      "llm_calls": 0,
+      "tool_calls": [],
+      "expected_tools": [
+        "read_document",
+        "write_chart",
+        "write_pptx"
+      ],
+      "answer_preview": "",
+      "artifacts": [],
+      "checks": [],
+      "format_ok": 0,
+      "format_total": 0
+    },
+    {
+      "task_id": "C05",
+      "difficulty": "complex",
+      "status": "completed",
+      "reason": "",
+      "completed": true,
+      "elapsed_s": 26.57,
+      "llm_calls": 2,
+      "tool_calls": [
+        "search_knowledge_base"
+      ],
+      "expected_tools": [
+        "search_knowledge_base",
+        "write_file"
+      ],
+      "answer_preview": "根据检索结果，以下是与「国产适配」相关的段落，按时间排序并标注来源文件：\n\n1. 来源：data/inbox/eval_fixtures/policy_doc.docx（2026年11月3日）\n   - 会议内容涉及国产 CPU 与麒麟操作系统的适配验证。\n\n2. 来源：data/inbox/eval_fixtures/meeting_long.txt（2026年11月6日）\n   - 会议内容提及国产适配，但具体细节未详细展开。\n\n3. 来源：data/inbox/eval_fixtures/meeting_long.txt（2026年11月30日、12月15日）\n   - 会议内容明确11",
+      "artifacts": [
+        "data/outbox/eval_20261109_192019/C05/eval.sqlite3"
+      ],
+      "checks": [
+        {
+          "rule": "回答关键字",
+          "ok": true,
+          "detail": "命中 ['来源', '适配']/['来源', '适配']（mode=all）"
+        },
+        {
+          "rule": "回答长度 ≥150",
+          "ok": true,
+          "detail": "实际 769"
+        }
+      ],
+      "format_ok": 0,
+      "format_total": 0
+    },
+    {
+      "task_id": "C06",
+      "difficulty": "complex",
+      "status": "skipped",
+      "reason": "依赖未实现能力：gui、wps_adapter",
+      "completed": false,
+      "elapsed_s": 0.0,
+      "llm_calls": 0,
+      "tool_calls": [],
+      "expected_tools": [
+        "gui_open_app",
+        "gui_edit_document",
+        "gui_save_as"
+      ],
+      "answer_preview": "",
+      "artifacts": [],
+      "checks": [],
+      "format_ok": 0,
+      "format_total": 0
+    },
+    {
+      "task_id": "C07",
+      "difficulty": "complex",
+      "status": "skipped",
+      "reason": "依赖未实现能力：a2a、edge、mcp_server",
+      "completed": false,
+      "elapsed_s": 0.0,
+      "llm_calls": 0,
+      "tool_calls": [],
+      "expected_tools": [
+        "a2a_dispatch",
+        "edge_infer",
+        "write_file"
+      ],
+      "answer_preview": "",
+      "artifacts": [],
+      "checks": [],
+      "format_ok": 0,
+      "format_total": 0
+    }
+  ],
+  "ttft": {
+    "value_s": 0.159,
+    "samples_ms": [
+      123.8,
+      159.5,
+      6941.0
+    ],
+    "status": "measured",
+    "note": "stream=True 探测 3/3 次，取中位数"
+  },
+  "memory": {
+    "value_gb": 2.265,
+    "status": "measured",
+    "note": "303 次采样；Ollama 系列进程峰值 2251MB；tasklist(ollama*) + GetProcessMemoryInfo(python)；GPU 显存峰值 5420MB 未计入 RSS 指标（nvidia-smi，1 张卡）；混合推理口径需在纯 CPU 环境复测",
+    "gpu_vram_peak_gb": 5.293,
+    "gpu_note": "GPU 显存峰值 5420MB 未计入 RSS 指标（nvidia-smi，1 张卡）；混合推理口径需在纯 CPU 环境复测"
+  },
+  "summary": {
+    "metrics": [
+      {
+        "name": "任务完成率",
+        "value": 0.75,
+        "target": 0.7,
+        "unit": "ratio",
+        "op": ">=",
+        "status": "pass",
+        "note": "15/20；跳过 5 条计入未完成"
+      },
+      {
+        "name": "工具调用准确率",
+        "value": 0.8788,
+        "target": 0.85,
+        "unit": "ratio",
+        "op": ">=",
+        "status": "pass",
+        "note": "LCS 对齐 29/33 次调用；recall=0.8787878787878788"
+      },
+      {
+        "name": "格式正确率",
+        "value": 1.0,
+        "target": 0.8,
+        "unit": "ratio",
+        "op": ">=",
+        "status": "pass",
+        "note": "6/6 个格式检查项"
+      },
+      {
+        "name": "平均完成步数",
+        "value": 3.07,
+        "target": 6,
+        "unit": "step",
+        "op": "<=",
+        "status": "pass",
+        "note": "统计 15 条已执行任务的 LLM 循环轮数"
+      },
+      {
+        "name": "平均耗时",
+        "value": 29.08,
+        "target": 180,
+        "unit": "s",
+        "op": "<=",
+        "status": "pass",
+        "note": "简单任务均值 9.45s（目标 ≤30s）"
+      },
+      {
+        "name": "首 Token 延迟",
+        "value": 0.159,
+        "target": 1.5,
+        "unit": "s",
+        "op": "<=",
+        "status": "pass",
+        "note": "stream=True 探测 3/3 次，取中位数"
+      },
+      {
+        "name": "内存峰值",
+        "value": 2.265,
+        "target": 6.0,
+        "unit": "GB",
+        "op": "<=",
+        "status": "pass",
+        "note": "303 次采样；Ollama 系列进程峰值 2251MB；tasklist(ollama*) + GetProcessMemoryInfo(python)；GPU 显存峰值 5420MB 未计入 RSS 指标（nvidia-smi，1 张卡）；混合推理口径需在纯 CPU 环境复测"
+      }
+    ],
+    "passed": 7,
+    "measured": 7,
+    "total": 7,
+    "status_counts": {
+      "completed": 15,
+      "skipped": 5
+    },
+    "executed": 15,
+    "skipped": 5,
+    "completed": 15,
+    "total_tasks": 20,
+    "is_full_benchmark": true,
+    "simple_avg_elapsed_s": 9.45,
+    "simple_target_s": 30,
+    "tool_recall": 0.8788,
+    "notes": [
+      "任务完成率分母为 20 条；依赖未实现能力而跳过的任务记为未完成。",
+      "工具准确率口径 = LCS 对齐后的 micro precision；recall 另列，防止少调工具刷分。",
+      "平均完成步数 = LLM chat 调用轮数（Agent 循环步），不含纯工具内部处理。",
+      "跳过的任务不进入工具准确率 / 格式 / 步数 / 耗时的分母，避免摊薄。"
+    ]
+  }
+}

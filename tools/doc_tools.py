@@ -19,6 +19,10 @@ from core.tool_registry import ToolResult, tool
 
 SANDBOX = config.project_root.resolve()
 
+# 公文通知必须有发文机关署名（GB/T 9704 亦要求落款）。工具层给默认值，
+# 避免 7B 漏传 signature 时产出「无落款的半成品通知」。
+DEFAULT_NOTICE_SIGNATURE = "办公室"
+
 
 def _resolve(path: str) -> Path:
     p = Path(path)
@@ -309,7 +313,7 @@ def write_todos_xlsx(path: str, todos: str) -> ToolResult:
 
 @tool(
     name="write_notice_txt",
-    description="起草并保存一份会议通知或邮件正文（纯文本）",
+    description="起草并保存一份会议通知或邮件正文（纯文本）。通知须含主题、收件人、落款单位与日期",
     parameters={
         "type": "object",
         "properties": {
@@ -317,15 +321,39 @@ def write_todos_xlsx(path: str, todos: str) -> ToolResult:
             "subject": {"type": "string", "description": "通知/邮件主题"},
             "body": {"type": "string", "description": "正文内容"},
             "recipients": {"type": "string", "description": "收件人，逗号分隔（仅记录，不实际发送）"},
+            "signature": {"type": "string", "description": "落款单位，按任务指令指定填写，如「办公室」"},
+            "department": {"type": "string", "description": "收件部门名称，按任务指令指定填写，如「技术科」"},
         },
         "required": ["path", "subject", "body"],
     },
     dangerous=True,
 )
-def write_notice_txt(path: str, subject: str, body: str, recipients: str = "") -> ToolResult:
+def write_notice_txt(
+    path: str,
+    subject: str,
+    body: str,
+    recipients: str = "",
+    signature: str = "",
+    department: str = "",
+) -> ToolResult:
+    """通知的格式契约由工具层保证：主题 / 收件对象 / 正文 / 落款。
+
+    generic 路由下 7B 常漏掉落款或收件部门（首轮 M04、M08 的真实原因），
+    pipeline 路由则由 EmailAgent 传入。两条路由在这里收敛到同一份完整文档。
+    """
     resolved = _resolve(path)
     resolved.parent.mkdir(parents=True, exist_ok=True)
-    content = f"主题：{subject}\n收件人：{recipients or '（未填写）'}\n\n{body}\n"
+
+    # 部门名落在收件人行（主题保持模型给定的表述，避免出现「关于X的关于…」）
+    recipient_line = recipients or department or "（未填写）"
+    if department and department not in recipient_line:
+        recipient_line = f"{department}：{recipient_line}"
+
+    lines = [f"主题：{subject}", f"收件人：{recipient_line}", "", body.rstrip()]
+    effective_signature = signature or DEFAULT_NOTICE_SIGNATURE
+    if effective_signature not in body:
+        lines += ["", effective_signature, "（日期）"]
+    content = "\n".join(lines) + "\n"
     resolved.write_text(content, encoding="utf-8")
     return ToolResult(
         ok=True, content=f"已保存通知草稿：{resolved}\n---\n{content}",
