@@ -67,6 +67,13 @@ class ToolSpec:
                 tool_name=self.name,
                 elapsed_ms=elapsed,
             )
+        except PermissionError as exc:
+            elapsed = int((time.perf_counter() - start) * 1000)
+            hint = (
+                "文件被占用或无写入权限（很可能正被 Word / Excel / 预览器打开）。"
+                "关闭该文件后重试，或换一个输出路径。"
+            )
+            return ToolResult.failure(self.name, f"{hint} 原始错误：{exc}", elapsed)
         except Exception as exc:  # noqa: BLE001 - 故意兜住全部，交给模型自我修正
             elapsed = int((time.perf_counter() - start) * 1000)
             return ToolResult.failure(self.name, f"{type(exc).__name__}: {exc}", elapsed)

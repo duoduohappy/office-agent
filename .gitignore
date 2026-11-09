@@ -1,3 +1,5 @@
 data/workspace/memory.sqlite3
 __pycache__/
 *.pyc
+tests/_tmp_out/
+data/outbox/demo_*/

@@ -10,6 +10,7 @@ Planner → MeetingAgent → DocAgent → Reflection → EmailAgent → Reflecti
 from __future__ import annotations
 
 import sys
+from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -36,6 +37,8 @@ def main() -> int:
 
     llm = ScriptedLLM()
     orchestrator = Orchestrator(llm, registry, memory)
+    # 每次演示用独立目录：避免覆盖正在被 Word / 预览器打开的文件（Windows 文件锁）
+    out_dir = f"data/outbox/demo_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
     result = orchestrator.run_meeting_pipeline(
         "data/inbox/sample_meeting.txt",
         title="2026年第11次部门例会纪要",
@@ -43,6 +46,7 @@ def main() -> int:
         location="三楼会议室",
         host="张伟",
         attendees="张伟、李娜、王强、赵敏、陈建国",
+        out_dir=out_dir,
     )
 
     print("=" * 66)

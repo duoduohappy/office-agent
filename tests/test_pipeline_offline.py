@@ -100,7 +100,7 @@ def test_doc_tools() -> None:
 
     # 生成纪要并读回验证（GB/T 9704 格式 + 内容）
     r = reg.dispatch("write_minutes_docx", {
-        "path": "data/outbox/test_纪要.docx", "title": "2026年第11次部门例会纪要",
+        "path": "tests/_tmp_out/doc/test_纪要.docx", "title": "2026年第11次部门例会纪要",
         "meeting_date": "2026年11月6日", "location": "三楼会议室", "host": "张伟",
         "attendees": "张伟、李娜、王强", "summary": "会议听取了三季度项目进展汇报，明确年底验收安排在12月15日。",
         "todos": json.dumps(todos, ensure_ascii=False),
@@ -126,16 +126,16 @@ def test_doc_tools() -> None:
         rr = reg.dispatch("read_document", {"path": r.meta["path"]})
         check("doc_tools：read_document 读回 docx", rr.ok and "年底验收" in rr.content, str(rr.error))
 
-    rx = reg.dispatch("write_todos_xlsx", {"path": "data/outbox/test_待办.xlsx", "todos": json.dumps(todos, ensure_ascii=False)})
+    rx = reg.dispatch("write_todos_xlsx", {"path": "tests/_tmp_out/doc/test_待办.xlsx", "todos": json.dumps(todos, ensure_ascii=False)})
     check("doc_tools：待办 xlsx 生成", rx.ok, str(rx.error))
     if rx.ok:
         rr = reg.dispatch("read_document", {"path": rx.meta["path"]})
         check("doc_tools：read_document 读回 xlsx", rr.ok and "李娜" in rr.content, str(rr.error))
 
-    rn = reg.dispatch("write_notice_txt", {"path": "data/outbox/notices/test_通知.txt", "subject": "测试通知", "body": "正文内容"})
+    rn = reg.dispatch("write_notice_txt", {"path": "tests/_tmp_out/doc/test_通知.txt", "subject": "测试通知", "body": "正文内容"})
     check("doc_tools：通知草稿生成", rn.ok, str(rn.error))
 
-    bad = reg.dispatch("read_document", {"path": "data/outbox/不存在.docx"})
+    bad = reg.dispatch("read_document", {"path": "tests/_tmp_out/doc/不存在.docx"})
     check("doc_tools：不存在文件结构化报错", not bad.ok and "不存在" in (bad.error or ""))
 
 
@@ -210,6 +210,7 @@ def _run_pipeline_checks(reg: ToolRegistry, mem: StructuredMemory) -> None:
             "data/inbox/sample_meeting.txt",
             title="2026年第11次部门例会纪要", meeting_date="2026年11月6日",
             location="三楼会议室", host="张伟", attendees="张伟、李娜、王强",
+            out_dir="tests/_tmp_out/pipeline",
         )
         check("闭环：Planner 出计划", result.plan is not None and len(result.plan.steps) == 4)
         statuses = [s.status for s in result.plan.steps]
@@ -238,7 +239,7 @@ def _run_pipeline_checks(reg: ToolRegistry, mem: StructuredMemory) -> None:
         # 反思拦截场景：待办为空 → 邮件流程应被阻断
         llm_bad = ScriptedLLM(todos=[], email_body="短")
         orch_bad = Orchestrator(llm_bad, reg, mem)
-        blocked = orch_bad.run_meeting_pipeline("data/inbox/sample_meeting.txt", use_plan=False)
+        blocked = orch_bad.run_meeting_pipeline("data/inbox/sample_meeting.txt", use_plan=False, out_dir="tests/_tmp_out/pipeline_bad")
         # 空待办只产生 warn，不阻断；改为注入空摘要场景验证拦截路径
         check("闭环：空待办不误阻断", len(blocked.outputs) >= 2, str(blocked.errors))
 
@@ -256,10 +257,17 @@ def _run_pipeline_checks(reg: ToolRegistry, mem: StructuredMemory) -> None:
 
 
 def main() -> int:
-    test_doc_tools()
-    test_meeting_agent()
-    test_reflection()
-    test_pipeline()
+    import shutil
+
+    tmp_out = ROOT / "tests" / "_tmp_out"
+    try:
+        test_doc_tools()
+        test_meeting_agent()
+        test_reflection()
+        test_pipeline()
+    finally:
+        # 测试产物与交付产物隔离；Windows 上若被占用则跳过，不影响下次运行
+        shutil.rmtree(tmp_out, ignore_errors=True)
     print(f"\n{'=' * 46}\n通过 {PASS} / 失败 {FAIL} / 共 {PASS + FAIL}")
     return 1 if FAIL else 0
 

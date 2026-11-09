@@ -15,7 +15,8 @@
 
 演示用脚本化 LLM 模拟 Qwen2.5-7B 的 6 次调用（plan → map×2 → reduce → todos → email），
 走通 Planner → MeetingAgent → DocAgent → Reflection → EmailAgent → Reflection → DesktopAgent，
-并在 `data/outbox/` 下产出会议纪要 docx、待办清单 xlsx、会议通知草稿。
+并在 `data/outbox/demo_<时间戳>/` 下产出会议纪要 docx、待办清单 xlsx、会议通知草稿
+（独立目录，不会覆盖正在被 Word / 预览器打开的文件）。
 
 ## 架构与实现状态
 

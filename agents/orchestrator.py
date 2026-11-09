@@ -91,6 +91,7 @@ class Orchestrator:
         attendees: str = "",
         recipients_group: str = "全体成员",
         use_plan: bool = True,
+        out_dir: str = "data/outbox",
     ) -> PipelineResult:
         task = f"把「{transcript_source if len(transcript_source) < 60 else '会议录音转写稿'}」整理成纪要，提取待办，起草会议通知"
         result = PipelineResult(task=task)
@@ -123,6 +124,7 @@ class Orchestrator:
         bundle = self.doc_agent.write_minutes(
             title=title, summary=meeting.summary, todos=meeting.todos,
             meeting_date=meeting_date, location=location, host=host, attendees=attendees,
+            out_dir=out_dir,
         )
         result.doc_bundle = bundle
         result.outputs.extend(bundle.outputs)
@@ -152,7 +154,7 @@ class Orchestrator:
 
         # --- 步骤 5：EmailAgent 起草通知 + 查收件人 ---
         draft = self.email_agent.compose(meeting.summary, meeting.todos, group=recipients_group)
-        draft = self.email_agent.save(draft)
+        draft = self.email_agent.save(draft, out_path=f"{out_dir.rstrip('/')}/notices/会议通知.txt")
         result.email_draft = draft
         if draft.path:
             result.outputs.append(draft.path)

@@ -122,6 +122,7 @@ def main() -> int:
     parser.add_argument("--title", default="部门例会纪要", help="会议纪要标题")
     parser.add_argument("--attendees", default="", help="参会人员，逗号分隔")
     parser.add_argument("--group", default="全体成员", help="通知收件人组 / 部门名")
+    parser.add_argument("--out-dir", default="data/outbox", help="产出目录（默认 data/outbox）")
     args = parser.parse_args()
 
     if args.check:
@@ -151,7 +152,7 @@ def main() -> int:
         orch = Orchestrator(llm, registry, memory)
         result = orch.run_meeting_pipeline(
             args.pipeline, title=args.title, attendees=args.attendees,
-            recipients_group=args.group,
+            recipients_group=args.group, out_dir=args.out_dir,
         )
         print(f"\n{'=' * 60}\n{result.summary()}\n{'=' * 60}")
         print(f"[闭环状态] {'成功' if result.ok else '存在未解决问题'}")
