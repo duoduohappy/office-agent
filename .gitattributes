@@ -1,0 +1,19 @@
+# 统一行尾，避免 Windows / Linux（信创麒麟）混合协作时的整文件 diff
+* text=auto
+
+*.py   text eol=lf
+*.md   text eol=lf
+*.json text eol=lf
+*.txt  text eol=lf
+*.sh   text eol=lf
+*.ps1  text eol=crlf
+*.bat  text eol=crlf
+
+# 二进制产物不要做行尾转换，也不要在 diff 里当文本解析
+*.docx  binary
+*.xlsx  binary
+*.pptx  binary
+*.pdf   binary
+*.png   binary
+*.jpg   binary
+*.sqlite3 binary
