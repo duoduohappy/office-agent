@@ -69,25 +69,14 @@ def build_agent(model: str | None = None, agent_name: str = "GeneralAgent") -> A
 
 
 def _user_env(name: str) -> str:
-    """读用户级环境变量。
+    """读用户级环境变量（阶段 3 起经 HAL.PathProvider，屏蔽注册表/配置文件差异）。
 
-    set_disk_env.ps1 写入的是注册表 HKCU\\Environment，当前已打开的终端
-    不一定能立刻看到；自检时把注册表值也读出来，避免误报"未配置"。
+    Windows 侧仍会读 HKCU\\Environment（set_disk_env 脚本写入的位置），
+    Linux 侧读 environment.d 配置；上层自检逻辑不感知平台差异。
     """
-    import os
+    from adapt.hal import get_hal
 
-    current = os.getenv(name, "")
-    if current:
-        return current
-    if sys.platform == "win32":
-        import winreg
-
-        try:
-            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Environment") as key:
-                return str(winreg.QueryValueEx(key, name)[0])
-        except OSError:
-            return ""
-    return ""
+    return get_hal().user_env(name)
 
 
 def check_env() -> int:

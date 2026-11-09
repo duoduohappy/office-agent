@@ -9,13 +9,19 @@
 > **项目状态（请先读）**：这是一个**阶段性 PoC**，不是已交付的商用系统。
 > 已在真实模型 `qwen2.5:7b-instruct-q4_K_M` 上跑过**两轮全量 20 条评测**：
 > 第一轮 **6/7 达标、完成率 50%（10/20）**；第二轮（补齐工程闭环 + 本地检索后）
-> **7/7 达标、完成率 75%（15/20）**。当前离线断言 **266/266** 全部通过。
+> **7/7 达标、完成率 75%（15/20）**。当前离线断言 **346/346** 全部通过。
 > 但请务必注意：**这是项目自评测，不是第三方验收**；仍有 5 条复杂任务被跳过，
 > 且内存指标在 GPU 混合推理下取得、尚未在纯 CPU 信创环境复测。
 >
-> 本轮另外实现了 **MCP 服务端、A2A 协议、Chroma 向量库与引用溯源、端边云协同**
+> 另外实现了 **MCP 服务端、A2A 协议、Chroma 向量库与引用溯源、端边云协同**
 > （见「协议层与端边云协同」）。这四块**尚未纳入 20 条评测集**：两轮成绩不受影响，
 > 也不代表验收范围扩大。两轮报告与失败归因见下方「真实评测」章节。
+>
+> **阶段 3 国产适配的代码层已落地**（见「阶段 3 国产适配」与 `docs/xinchuang-validation.md`）：
+> HAL 抽象层已接入内存采样 / 字体 / GUI 后端 / 环境变量读取，aarch64 依赖真实审计、
+> CMake 交叉编译脚本、麒麟 / UOS / WPS Linux 目标机兼容性探针均已完成。
+> 但**麒麟 / UOS 实机、飞腾 / 鲲鹏 ARM 真机、WPS Linux 版式比对三项均未执行**，
+> 报告中 `real_target_verified=false`，**不能表述为「已完成国产适配」或「通过信创兼容性验证」**。
 
 ## 快速体验（不需要装 Ollama）
 
@@ -25,9 +31,10 @@
 .venv\Scripts\python.exe tests\test_pipeline_offline.py # 47 项
 .venv\Scripts\python.exe tests\test_eval_offline.py    # 92 项（只验证评测器逻辑，不产生指标实测值）
 .venv\Scripts\python.exe tests\test_protocols_edge_offline.py  # 103 项（协议层/向量库/端边云，含真实 HTTP 往返）
+.venv\Scripts\python.exe tests\test_adapt_offline.py      # 80 项（阶段 3 HAL / 审计 / 兼容性探针防伪造）
 ```
 
-协议层与协同层也不需要 Ollama：
+协议层、协同层与国产适配探针也不需要 Ollama：
 
 ```powershell
 .venv\Scripts\python.exe main.py --mcp                     # MCP stdio 服务端
@@ -35,6 +42,11 @@
 .venv\Scripts\python.exe main.py --a2a 127.0.0.1:8770     # Agent Card: /.well-known/agent.json
 .venv\Scripts\python.exe main.py --edge-selftest           # 端边云三节点本地联调
 .venv\Scripts\python.exe main.py --index-vectors           # 重建 Chroma 索引
+
+.venv\Scripts\python.exe -m adapt.hal                     # 打印真实平台 + 模拟信创平台能力矩阵
+.venv\Scripts\python.exe -m adapt.compat_check --out data/outbox/compat   # 生成 PASS/WARN/FAIL/SKIP 报告
+.venv\Scripts\python.exe -m adapt.arm_build               # 工具链探测（无网络）
+.venv\Scripts\python.exe -m adapt.arm_build --audit       # 真实 pip download 审计 aarch64 wheel
 ```
 
 需要 Ollama + 模型的真实链路（模型默认落在项目同级 `.cache\ollama`，由脚本按盘符自动推导）：
@@ -75,7 +87,10 @@
 | `protocols/mcp_server.py` | 5 / 7 | ✅ MCP JSON-RPC 2.0（stdio + HTTP）：tools/list / tools/call / resources；dangerous 工具默认策略拒绝 |
 | `protocols/a2a.py` | 3.3 / 7 | ✅ A2A Agent Card + `message/send` / `tasks/get` / `tasks/cancel` + 纯标准库客户端；🟡 无 SSE 流式 / push / 鉴权 |
 | `edge/coordination.py` | 3.1 | ✅ 三级路由、上送脱敏、离线队列、端↔边 A2A 同步、云侧只下发权重；🟡 三节点在本机模拟，无 32B 模型 |
-| `adapt/` | 7 阶段 3 | ⬜ 仍为占位：HAL / ARM 交叉编译 / 麒麟 UOS 适配未开始 |
+| `adapt/hal.py` | 7.3 / 7.4 步骤 1 | ✅ `PlatformInfo` 架构归一化（aarch64 / loongarch64 / sw_64）、字体解析、GUI 后端、内存探针、推理后端、路径与环境变量；模拟平台一律标 `simulated=true` / `real_target_verified=false` |
+| `eval/metrics.py`、`tools/doc_tools.py`、`agents/desktop_agent.py`、`main.py` | 7.4 步骤 1 | ✅ 平台相关调用已收敛到 HAL；Windows 行为与两轮评测保持一致 |
+| `adapt/arm_build.py`、`scripts/cross_build_llamacpp.sh`、`adapt/toolchains/` | 7.4 步骤 2 | 🟡 真实 `pip download` 审计 5/5 可获取（4 个 `py3-none-any` + chromadb aarch64 原生）；**交叉编译与 ARM 推理未执行** |
+| `adapt/compat_check.py`、`docs/xinchuang-validation.md` | 7.4 步骤 3 / 4 | 🟡 目标机一键探针、判据与操作清单就绪；开发机基线 PASS 4 / SKIP 8，**实机与 WPS 版式未验证** |
 
 **技术决策**：PDF 解析用纯 Python 的 `pypdf` 替代方案中的 PyMuPDF——
 国产 ARM 平台上 PyMuPDF 的预编译 wheel 经常缺失，纯 Python 实现部署成功率更高，
@@ -108,6 +123,8 @@ Chroma    : chromadb 1.5.9，backend=chroma（真实 HNSW）；扫描 23 片段 
 离线断言  : 新增 103 条，连同原有 163 条，共 266/266 通过
 ```
 
+> 上表是四模块落地当轮的快照；阶段 3 又新增 80 条断言，当前全仓为 **346/346**（见下节）。
+
 **边界（必须和上面一起说）**：
 
 - **embedding 不是语义模型**：为不再加载一个 embedding 模型（端侧 7B + 显存预算已紧），
@@ -125,6 +142,46 @@ Chroma    : chromadb 1.5.9，backend=chroma（真实 HNSW）；扫描 23 片段 
 - **四块能力尚未纳入 20 条评测集**：评测器使用固定 registry，本轮新增工具只注册到
   CLI 与 MCP；`benchmark_tasks.json` 的 `requires` 一条未删、grading 一个字未改。
   因此 50% / 75% 两轮成绩仍可复现，也**不代表验收范围扩大**。
+
+## 阶段 3 国产适配（代码层已落地，实机验证未执行）
+
+对照方案 7.4 的四步，逐项状态如下（完整清单、判据与操作命令见
+`docs/xinchuang-validation.md`，开发机基线见 `adapt/reports/compat_baseline.md`）：
+
+| 步骤 | 已完成（本机真实执行） | 未完成 |
+|---|---|---|
+| 1 开发期可移植性 | `adapt/hal.py`；内存采样、公文字体、GUI 后端、环境变量读取全部接入 HAL；Windows 侧保留原有 `仿宋_GB2312` / `方正小标宋简体` / `黑体` 字体族名 | — |
+| 2 编译验证 | CMake aarch64 toolchain、llama.cpp 交叉编译脚本；**真实 `pip download` 审计** 5/5 包可获取 | 本机无 aarch64 工具链 / ARM Linux / QEMU，交叉编译与 ARM 推理探针未执行 |
+| 3 真机适配 | 目标机一键探针 `adapt/compat_check.py`，覆盖 OS / 架构 / 字体 / AT-SPI / WPS / 推理后端 / 纯 CPU 基线 | 无飞腾 / 鲲鹏 + 麒麟 V10 / UOS V20 真机，性能基线未采集 |
+| 4 生态验证 | OOXML 产出用 python-docx / openpyxl 真实回读校验 | 未安装 WPS Linux / 永中 Office，**版式渲染一致性未比对**，需目视验收 |
+
+**本机实测**（2026-11-09，x86_64 Windows 11 / Python 3.13.14）：
+
+```text
+HAL         : 真实平台 x86_64 / Windows 11；模拟平台 Linux kylin + aarch64 标 simulated=true，
+              real_target_verified=false；字体解析在模拟麒麟走方正仿宋_GBK，Windows 仍走原字体
+wheel 审计  : 真实 pip download --only-binary --platform *aarch64*（腾讯镜像）：
+              python-docx / openpyxl / python-pptx / pypdf → py3-none-any（与架构无关）；
+              chromadb 1.5.9 → cp39-abi3-manylinux_2_17_aarch64（真正的 ARM 原生 wheel）
+工具链探测  : aarch64-linux-gnu-gcc/g++、cmake、ninja、qemu-aarch64-static、file 全部缺失，
+              can_cross_compile_here=false（如实记录，不写「已编译」）
+兼容性基线  : PASS 4 / WARN 0 / FAIL 0 / SKIP 8，real_target_verified=false
+离线断言    : 新增 80 条，全仓 346/346 通过（含 HAL 接入回归、防伪造 SKIP 检查、报告字段校验）
+```
+
+**防伪造设计**：`SKIP` 一律表示「本环境无法验证」，**不是通过**；只有当探测到的
+平台同时满足「非模拟 + 麒麟/UOS Linux + aarch64」时 `real_target_verified` 才为 `true`；
+`arm_build.py` 的 `cross_compile_executed` / `arm_inference_verified` 在本机恒为 `false`。
+`py3-none-any` wheel 被明确标注为「通用 wheel」，**不冒充 ARM 编译产物**；
+`--no-deps` 审计只验证各包自身，依赖链仍需目标机完整 `pip install` 复验。
+
+**一句话边界**：本项目自身是纯 Python，没有需要交叉编译的代码；方案 7.4 步骤 2 的
+编译对象是推理后端 llama.cpp / Ollama（C++），脚本是给带 aarch64 工具链的 Linux
+构建机用的，**脚本生成 ≠ 编译完成**。麒麟 V10 / UOS V20 常见自带 Python 3.7/3.8，
+而本项目语法下限是 3.10，目标机需另装 CPython 3.10+。
+
+本阶段未改动 `benchmark_tasks.json` 的 `requires` / grading / 关键字 / 70% 阈值，
+新模块未注册进评测器 ToolRegistry，**国产适配不计入任何验收成绩**。
 
 ## 接入真实模型
 
@@ -218,8 +275,13 @@ python main.py "列出 data/inbox 下的文件并总结内容"   # 通用任务�
   「语义检索 + 引用溯源」里的「语义」二字不成立，能成立的是「向量索引 + 结构化引文核验」
 - **协议与协同的实现边界**：MCP 无 Streamable HTTP / SSE；A2A 无流式订阅、push、鉴权，
   Task 不持久化；三节点在本机模拟、边侧无 32B 模型、云侧无训练 SFT；脱敏不能替代正式 DLP
+- **阶段 3 只完成代码层，实机验证全部缺失**：麒麟 V10 / UOS V20、飞腾 D3000M / 鲲鹏 920 真机、
+  WPS Linux 版式目视比对、aarch64 交叉编译与 ARM 最小推理探针、纯 CPU 内存 / TTFT 基线均未执行；
+  开发机基线 PASS 4 / **SKIP 8**、`real_target_verified=false`，
+  **不能说「已完成国产适配」或「通过信创兼容性验证」**
+- **aarch64 依赖链未复验**：审计用了 `--no-deps`，Chroma 的传递依赖需在目标机完整
+  `pip install` 验证；目标机常见自带 Python 3.7/3.8 与本项目 3.10 语法下限的冲突尚未实机解决
 - 语音实际转写、GUI 实际操作仍未实现
-- 阶段 3 国产适配（HAL 抽象层、ARM 交叉编译、麒麟/UOS 与 WPS Linux 兼容性验证）未开始，`adapt/` 仍为占位
 
 ## 第一轮真实评测（2026-11-09）
 

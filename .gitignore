@@ -1,7 +1,13 @@
 # 运行时产物（演示 / 评测 / 数据库）
 data/outbox/
 data/workspace/
+data/wheelhouse-aarch64/
 tests/_tmp_out/
+build-aarch64/
+
+# 阶段 3 兼容性探针生成的二进制验证产物（报告本身保留在 adapt/reports/）
+adapt/reports/_compat_artifacts/
+adapt/reports/*/pdf/
 
 # Python 环境与缓存
 .venv/

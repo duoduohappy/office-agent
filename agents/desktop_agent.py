@@ -35,20 +35,11 @@ class DesktopAgent:
 
     @staticmethod
     def ui_backend() -> str:
-        """探测当前可用的 UI 自动化后端。"""
-        if os.name == "nt":
-            try:
-                import uiautomation  # noqa: F401
+        """探测当前可用的 UI 自动化后端（阶段 3 起由 HAL.GuiBackend 统一判定）。"""
+        from adapt.hal import get_hal
 
-                return "windows-uia"
-            except ImportError:
-                return "unavailable"
-        try:
-            import pyatspi  # noqa: F401
-
-            return "linux-atspi"
-        except ImportError:
-            return "unavailable"
+        probe = get_hal().gui.probe()
+        return probe["name"] if probe["available"] else "unavailable"
 
     def is_allowed(self, app: str) -> bool:
         key = app.lower()

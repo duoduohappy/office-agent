@@ -142,91 +142,31 @@ def probe_ttft_ms(host: str, model: str, timeout: float = 60.0, repeats: int = 3
 
 # ---------------------------------------------------------------- 内存采样
 def _windows_process_rss(names: set[str]) -> float:
-    """用 tasklist 拿指定进程 RSS（KB→MB）。无需 psutil。"""
-    creationflags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
-    proc = subprocess.run(
-        ["tasklist", "/FO", "CSV", "/NH"],
-        capture_output=True, timeout=10,
-        creationflags=creationflags,
-    )
-    # tasklist 在中文 Windows 输出 GBK/OEM 编码，不能用 text=True 按 UTF-8 解码，
-    # 否则 subprocess 的 reader 线程会抛 UnicodeDecodeError 并吞掉整段输出。
-    # 进程名与内存数字都是 ASCII，用 errors="replace" 无损。
-    out = proc.stdout.decode("utf-8", errors="replace")
-    total = 0.0
-    for line in out.splitlines():
-        parts = [p.strip(' "') for p in line.split('","')]
-        if len(parts) < 5:
-            continue
-        pname = parts[0].lower()
-        # Ollama 各版本的 runner 进程名不统一：ollama.exe（serve）、
-        # ollama_llama_server.exe（旧版）、llama-server.exe（v0.40.x）。
-        # 写死名单会漏掉真正加载权重的那个进程，把 serve 的 ~60MB
-        # 误报成「运行时内存峰值」——这是会伪造达标结论的错误。
-        if not (pname in names or pname.startswith("ollama") or "llama-server" in pname):
-            continue
-        try:
-            total += float(parts[-1].replace(",", "").replace(".", "").replace(" K", "").strip()) / 1024
-        except ValueError:
-            continue
-    return total
+    """兼容旧断言的入口；实际采样逻辑在 adapt.hal.MemoryProbe（阶段 3 解耦）。
+
+    传入本模块的 subprocess.run，使既有 mock 断言仍能验证 tasklist 解析逻辑。
+    """
+    from adapt.hal import get_hal
+
+    hal = get_hal()
+    if not hal.info.is_windows:
+        return 0.0
+    return hal.memory.windows_process_rss(names, runner=subprocess.run)
 
 
 def _self_rss_mb() -> float:
-    if sys.platform == "linux":
-        try:
-            with open("/proc/self/statm", encoding="utf-8") as f:
-                pages = int(f.read().split()[1])
-            return pages * os.sysconf("SC_PAGE_SIZE") / 1024 / 1024
-        except (OSError, ValueError, IndexError):
-            return 0.0
-    if sys.platform == "win32":
-        import ctypes
-        from ctypes import wintypes
+    """当前进程 RSS（MB）；Windows/Linux 分支由 HAL 决定。"""
+    from adapt.hal import get_hal
 
-        class PROCESS_MEMORY_COUNTERS(ctypes.Structure):
-            _fields_ = [
-                ("cb", wintypes.DWORD), ("PageFaultCount", wintypes.DWORD),
-                ("PeakWorkingSetSize", ctypes.c_size_t), ("WorkingSetSize", ctypes.c_size_t),
-                ("QuotaPeakPagedPoolUsage", ctypes.c_size_t), ("QuotaPagedPoolUsage", ctypes.c_size_t),
-                ("QuotaPeakNonPagedPoolUsage", ctypes.c_size_t), ("QuotaNonPagedPoolUsage", ctypes.c_size_t),
-                ("PagefileUsage", ctypes.c_size_t), ("PeakPagefileUsage", ctypes.c_size_t),
-            ]
-
-        counter = PROCESS_MEMORY_COUNTERS()
-        counter.cb = ctypes.sizeof(counter)
-        # 必须显式声明 argtypes/restype：默认 restype=c_int 会把 64 位伪句柄
-        # (HANDLE)-1 截断，GetProcessMemoryInfo 静默失败并返回 0 MB。
-        psapi = ctypes.WinDLL("psapi")
-        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
-        kernel32.GetCurrentProcess.restype = wintypes.HANDLE
-        psapi.GetProcessMemoryInfo.argtypes = [
-            wintypes.HANDLE, ctypes.POINTER(PROCESS_MEMORY_COUNTERS), wintypes.DWORD
-        ]
-        psapi.GetProcessMemoryInfo.restype = wintypes.BOOL
-        ok = psapi.GetProcessMemoryInfo(
-            kernel32.GetCurrentProcess(), ctypes.byref(counter), counter.cb
-        )
-        return counter.WorkingSetSize / 1024 / 1024 if ok else 0.0
-    return 0.0
+    return get_hal().memory.self_rss_mb()
 
 
 def _linux_ollama_rss_mb() -> float:
-    from pathlib import Path
+    """推理进程 RSS（MB）。Linux 走 /proc，Windows 走 tasklist。"""
+    from adapt.hal import get_hal
 
-    total = 0.0
-    for cmdline in Path("/proc").glob("[0-9]*/cmdline"):
-        try:
-            if b"ollama" not in cmdline.read_bytes().lower():
-                continue
-            status = (cmdline.parent / "status").read_text(encoding="utf-8")
-            for line in status.splitlines():
-                if line.startswith("VmRSS:"):
-                    total += int(line.split()[1]) / 1024
-                    break
-        except (OSError, ValueError, IndexError):
-            continue
-    return total
+    hal = get_hal()
+    return 0.0 if hal.info.is_windows else hal.memory._linux_process_rss(set())
 
 
 def sample_gpu_vram_mb() -> tuple[float | None, str]:
@@ -264,11 +204,14 @@ def sample_gpu_vram_mb() -> tuple[float | None, str]:
 def sample_runtime_rss_mb() -> tuple[float | None, str, float]:
     """返回 (运行时总 RSS MB, 数据来源, Ollama 进程 RSS MB)。拿不到总量返回 None。"""
     try:
+        from adapt.hal import get_hal
+
+        hal = get_hal()
         self_mb = _self_rss_mb()
-        if sys.platform == "win32":
-            ollama_mb = _windows_process_rss({"ollama.exe", "ollama app.exe", "ollama_llama_server.exe"})
+        ollama_mb, _source = hal.memory.process_rss_mb(hal.memory.OLLAMA_NAMES)
+        # note 文案保持与两轮真实评测报告一致，改动不得让历史数字不可复现。
+        if hal.info.is_windows:
             return self_mb + ollama_mb, "tasklist(ollama*) + GetProcessMemoryInfo(python)", ollama_mb
-        ollama_mb = _linux_ollama_rss_mb()
         return self_mb + ollama_mb, "/proc/*/status VmRSS(ollama*) + /proc/self/statm", ollama_mb
     except Exception as exc:  # noqa: BLE001
         return None, f"{type(exc).__name__}: {exc}", 0.0

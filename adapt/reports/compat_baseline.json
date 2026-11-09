@@ -1,0 +1,205 @@
+{
+  "generated_at": "2026-11-09 21:20:19",
+  "platform": {
+    "system": "Windows",
+    "release": "11",
+    "arch": "x86_64",
+    "machine_raw": "AMD64",
+    "python_version": "3.13.14",
+    "distro_id": "",
+    "distro_name": "",
+    "distro_version": "",
+    "desktop": "windows",
+    "is_xinchuang_distro": false,
+    "is_arm_target": false,
+    "is_real_target": false,
+    "simulated": false
+  },
+  "simulated_platform": false,
+  "toolchains": {
+    "tools": {},
+    "missing": [
+      "aarch64-linux-gnu-gcc",
+      "aarch64-linux-gnu-g++",
+      "cmake",
+      "ninja",
+      "clang",
+      "zig",
+      "docker",
+      "qemu-aarch64-static",
+      "file"
+    ],
+    "gnu_cross_toolchain": false,
+    "can_cross_compile_here": false,
+    "container_emulation": false,
+    "note": "本机为 x86_64 Windows 开发环境；方案 7.4 步骤 2 要求在 ARM Linux 或带交叉工具链的 Linux 上执行",
+    "source": "shutil.which"
+  },
+  "checks": [
+    {
+      "id": "os",
+      "name": "信创 OS 识别",
+      "status": "skip",
+      "detail": "当前为开发机 Windows 11，需在麒麟 V10 / UOS V20 目标机执行",
+      "evidence": {
+        "system": "Windows"
+      },
+      "target_only": true
+    },
+    {
+      "id": "arch",
+      "name": "CPU 架构",
+      "status": "skip",
+      "detail": "归一化架构 x86_64（原始 AMD64）",
+      "evidence": {
+        "target_arches": [
+          "aarch64"
+        ]
+      },
+      "target_only": true
+    },
+    {
+      "id": "python",
+      "name": "Python 版本",
+      "status": "pass",
+      "detail": "3.13.14；本项目语法下限 3.10，麒麟/UOS 自带 3.7/3.8 通常需另装",
+      "evidence": {
+        "min": "3.10"
+      },
+      "target_only": false
+    },
+    {
+      "id": "deps",
+      "name": "核心文档依赖可导入",
+      "status": "pass",
+      "detail": "python-docx / openpyxl / python-pptx / pypdf",
+      "evidence": {
+        "python-docx": "ok",
+        "openpyxl": "ok",
+        "python-pptx": "ok",
+        "pypdf": "ok"
+      },
+      "target_only": false
+    },
+    {
+      "id": "chroma",
+      "name": "Chroma 向量库",
+      "status": "pass",
+      "detail": "真实 chromadb 可导入",
+      "evidence": {
+        "available": true,
+        "version": "1.5.9"
+      },
+      "target_only": false
+    },
+    {
+      "id": "fonts",
+      "name": "公文中文字体",
+      "status": "skip",
+      "detail": "开发机按 OOXML 字体族名写入 仿宋_GB2312；目标机需另验方正仿宋_GBK / FandolFangSong",
+      "evidence": {
+        "resolved": "仿宋_GB2312"
+      },
+      "target_only": true
+    },
+    {
+      "id": "gui",
+      "name": "AT-SPI / UKUI / DDE 桌面自动化",
+      "status": "skip",
+      "detail": "开发机后端 windows-uia（available=False）；需在麒麟 UKUI / UOS DDE 实机验证",
+      "evidence": {
+        "name": "windows-uia",
+        "package": "uiautomation",
+        "available": false,
+        "desktop": "windows",
+        "note": "uiautomation 未安装，GUI 自动化能力不可用",
+        "source": "importlib probe"
+      },
+      "target_only": true
+    },
+    {
+      "id": "wps",
+      "name": "WPS Linux / 永中 Office 安装",
+      "status": "skip",
+      "detail": "未检测到 wps/et/wpp/永中，无法做国产办公软件渲染兼容性验证",
+      "evidence": {
+        "installed": [],
+        "executables": {},
+        "wps_available": false,
+        "headless_converter": null,
+        "can_headless_convert": false,
+        "note": "WPS Linux 多数版本不提供命令行转换接口；检测到 CLI 才执行转换，否则标 SKIP",
+        "source": "shutil.which"
+      },
+      "target_only": true
+    },
+    {
+      "id": "ooxml",
+      "name": "公文 docx / 待办 xlsx 回读",
+      "status": "pass",
+      "detail": "用 python-docx / openpyxl 回读本项目的 OOXML 产出；仅证明标准解析器可读，不等价于 WPS 渲染一致",
+      "evidence": {
+        "ok": true,
+        "docx": "data/outbox/compat/minutes.docx",
+        "xlsx": "data/outbox/compat/todos.xlsx",
+        "docx_check": {
+          "ok": true,
+          "format": "docx",
+          "paragraphs": 4,
+          "note": "python-docx 回读成功"
+        },
+        "xlsx_check": {
+          "ok": true,
+          "format": "xlsx",
+          "sheets": [
+            "待办清单"
+          ],
+          "note": "openpyxl 回读成功"
+        }
+      },
+      "target_only": false
+    },
+    {
+      "id": "wps_render",
+      "name": "WPS 版式渲染比对",
+      "status": "skip",
+      "detail": "未检测到 WPS 或 LibreOffice 命令行转换接口，未做版式渲染比对",
+      "evidence": {
+        "status": "skip",
+        "note": "未检测到 WPS 或 LibreOffice 命令行转换接口，未做版式渲染比对"
+      },
+      "target_only": true
+    },
+    {
+      "id": "inference",
+      "name": "端侧推理后端",
+      "status": "skip",
+      "detail": "仅探测可执行文件，未验证模型推理；ARM 实机需另跑 llama.cpp 探针",
+      "evidence": {
+        "available": {},
+        "backend": null,
+        "note": "仅探测可执行文件，未验证模型推理；ARM 实机需另跑 llama.cpp 探针",
+        "source": "shutil.which"
+      },
+      "target_only": true
+    },
+    {
+      "id": "cpu_baseline",
+      "name": "纯 CPU 内存 / TTFT 基线",
+      "status": "skip",
+      "detail": "方案 8.2 的 <6GB 与 <1.5s 需在纯 CPU 信创机复测；开发机为 GPU 混合 offload，历史报告数值不作为信创口径",
+      "evidence": null,
+      "target_only": true
+    }
+  ],
+  "summary": {
+    "pass": 4,
+    "warn": 0,
+    "fail": 0,
+    "skip": 8
+  },
+  "real_target_verified": false,
+  "cross_compile_executed": false,
+  "arm_inference_verified": false,
+  "disclaimer": "SKIP 表示本环境无法验证，不是通过。只有同时满足「非模拟探测 + 麒麟/UOS Linux + aarch64」时 real_target_verified 才为 true；并且仍需人工在 WPS 中打开公文做版式目视验收。"
+}

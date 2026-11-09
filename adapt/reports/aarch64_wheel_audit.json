@@ -1,0 +1,170 @@
+{
+  "host": {
+    "system": "Windows",
+    "release": "11",
+    "arch": "x86_64",
+    "machine_raw": "AMD64",
+    "python_version": "3.13.14",
+    "distro_id": "",
+    "distro_name": "",
+    "distro_version": "",
+    "desktop": "windows",
+    "is_xinchuang_distro": false,
+    "is_arm_target": false,
+    "is_real_target": false,
+    "simulated": false
+  },
+  "toolchains": {
+    "tools": {},
+    "missing": [
+      "aarch64-linux-gnu-gcc",
+      "aarch64-linux-gnu-g++",
+      "cmake",
+      "ninja",
+      "clang",
+      "zig",
+      "docker",
+      "qemu-aarch64-static",
+      "file"
+    ],
+    "gnu_cross_toolchain": false,
+    "can_cross_compile_here": false,
+    "container_emulation": false,
+    "note": "本机为 x86_64 Windows 开发环境；方案 7.4 步骤 2 要求在 ARM Linux 或带交叉工具链的 Linux 上执行",
+    "source": "shutil.which"
+  },
+  "build_plan": {
+    "project_native_code": false,
+    "native_component": "llama.cpp / Ollama 推理后端（C++），不在本仓库内",
+    "target_cpu": [
+      "飞腾腾锐 D3000M (ARMv8 FTC862)",
+      "鲲鹏 920 (ARMv8 TaiShan)",
+      "飞腾腾云 S5000C (ARMv8)"
+    ],
+    "steps": [
+      {
+        "id": 1,
+        "action": "取得目标机架构与内核信息",
+        "where": "ARM Linux 目标机",
+        "command": "uname -m && cat /etc/os-release",
+        "executed_here": false
+      },
+      {
+        "id": 2,
+        "action": "交叉编译 llama.cpp（或直接使用官方 ARM 版 Ollama）",
+        "where": "带 aarch64 工具链的 Linux 构建机",
+        "command": "bash scripts/cross_build_llamacpp.sh --verify",
+        "executed_here": false
+      },
+      {
+        "id": 3,
+        "action": "在目标机用 Qwen2.5-7B Q4_K_M 跑最小推理探针",
+        "where": "ARM Linux 目标机",
+        "command": "./build-aarch64/bin/llama-cli -m qwen2.5-7b-instruct-q4_k_m.gguf -p '国产化适配测试' -n 32",
+        "executed_here": false
+      },
+      {
+        "id": 4,
+        "action": "采集 TTFT / 内存 / 纯 CPU 口径基线",
+        "where": "ARM Linux 目标机",
+        "command": "python -m eval.run_eval",
+        "executed_here": false
+      }
+    ],
+    "cross_compile_executed": false,
+    "arm_inference_verified": false,
+    "python_min_version": "3.10",
+    "python_version_note": "银河麒麟 V10 / 统信 UOS V20 常见自带 Python 3.7/3.8，本项目使用 PEP 604 (X | Y) 与 match 等 3.10+ 语法，目标机需另装 CPython 3.10+；此项必须在实机确认"
+  },
+  "wheel_audit": {
+    "target": {
+      "arch": "aarch64",
+      "python": "3.10",
+      "abi": "cp310",
+      "platform_tags": [
+        "manylinux_2_28_aarch64",
+        "manylinux_2_17_aarch64",
+        "manylinux2014_aarch64",
+        "linux_aarch64"
+      ],
+      "index": "https://mirrors.cloud.tencent.com/pypi/simple/"
+    },
+    "packages": [
+      {
+        "requirement": "python-docx>=1.1",
+        "ok": true,
+        "seconds": 1.8,
+        "wheels": [
+          "python_docx-1.2.0-py3-none-any.whl"
+        ],
+        "wheel_kinds": [
+          "pure_python_any"
+        ],
+        "error": ""
+      },
+      {
+        "requirement": "openpyxl>=3.1",
+        "ok": true,
+        "seconds": 2.9,
+        "wheels": [
+          "openpyxl-3.1.5-py2.py3-none-any.whl"
+        ],
+        "wheel_kinds": [
+          "pure_python_any"
+        ],
+        "error": ""
+      },
+      {
+        "requirement": "python-pptx>=0.6",
+        "ok": true,
+        "seconds": 1.8,
+        "wheels": [
+          "python_pptx-1.0.2-py3-none-any.whl"
+        ],
+        "wheel_kinds": [
+          "pure_python_any"
+        ],
+        "error": ""
+      },
+      {
+        "requirement": "pypdf>=5.0",
+        "ok": true,
+        "seconds": 1.8,
+        "wheels": [
+          "pypdf-7.0.0-py3-none-any.whl"
+        ],
+        "wheel_kinds": [
+          "pure_python_any"
+        ],
+        "error": ""
+      },
+      {
+        "requirement": "chromadb>=1.0",
+        "ok": true,
+        "seconds": 2.0,
+        "wheels": [
+          "chromadb-1.5.9-cp39-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl"
+        ],
+        "wheel_kinds": [
+          "aarch64_native"
+        ],
+        "error": ""
+      }
+    ],
+    "all_core_ok": true,
+    "optional_ok": true,
+    "native_aarch64_packages": [
+      "chromadb>=1.0"
+    ],
+    "pure_python_any_packages": [
+      "python-docx>=1.1",
+      "openpyxl>=3.1",
+      "python-pptx>=0.6",
+      "pypdf>=5.0"
+    ],
+    "wheelhouse_files": 5,
+    "scope_note": "--no-deps：只验证各包自身是否有 aarch64 可用 wheel。wheel_kinds 区分 pure_python_any（与架构无关的纯 Python wheel）与 aarch64_native（真正的 ARM 原生二进制）；前者不能被称作「ARM 编译产物」。依赖链需在目标机用完整 pip install 复验",
+    "cross_compile_executed": false,
+    "real_arm_install_verified": false
+  }
+}

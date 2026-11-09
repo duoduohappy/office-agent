@@ -35,9 +35,19 @@ def _resolve(path: str) -> Path:
 
 
 def _set_font(run, name_ascii: str = "Times New Roman", name_east: str = "仿宋_GB2312", size_pt: float = 16, bold: bool = False) -> None:
-    """python-docx 默认不设置 eastAsia 字体会导致中文回退成宋体，必须显式写 XML。"""
+    """python-docx 默认不设置 eastAsia 字体会导致中文回退成宋体，必须显式写 XML。
+
+    阶段 3：字体族名经 HAL.FontResolver 映射。Windows 上返回值与适配前
+    完全一致（保持两轮评测的公文版式可复现）；麒麟/UOS 上按 fc-list 结果
+    选国产字体，未安装时保留 OOXML 逻辑字体名并如实标注。
+    """
+    from adapt.hal import get_hal
     from docx.oxml.ns import qn
     from docx.shared import Pt
+
+    fonts = get_hal().fonts
+    name_ascii = fonts.resolve(name_ascii)[0]
+    name_east = fonts.resolve(name_east)[0]
 
     run.font.name = name_ascii
     run.font.size = Pt(size_pt)

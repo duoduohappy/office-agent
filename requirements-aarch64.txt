@@ -1,0 +1,29 @@
+# 飞腾 D3000M / 鲲鹏 920（aarch64）目标机依赖清单
+#
+# 前置条件（必须在目标机确认，不能靠开发机推断）：
+#   - CPython >= 3.10。麒麟 V10 / UOS V20 常见自带 3.7/3.8，
+#     本项目使用 PEP 604 (X | Y) 等 3.10+ 语法，无法直接运行。
+#   - 纯 CPU 环境不应安装 NVIDIA 相关依赖；Chroma 的 embedding 是本项目的
+#     标准库 bigram hashing，不需要 onnxruntime / 任何 embedding 模型。
+#
+# aarch64 wheel 可用性审计（开发机真实执行 pip download，见
+# adapt/reports/aarch64_wheel_audit.json）：
+#   - 纯 Python 通用 wheel (py3-none-any)：python-docx / openpyxl / python-pptx / pypdf
+#   - 真正的 ARM 原生 wheel：chromadb cp39-abi3-manylinux_2_17_aarch64
+# 审计使用 --no-deps，只验证包自身；依赖链请在目标机完整 pip install 复验。
+
+python-docx>=1.1
+openpyxl>=3.1
+python-pptx>=0.6
+pypdf>=5.0
+
+# 可选重依赖。未安装时 memory/vector_store.py 会降级到
+# fallback-hash-cosine 并在所有结果里标注，不会冒充真实 Chroma。
+chromadb>=1.0
+
+# 安装示例（目标机，使用国内镜像）：
+#   python3.10 -m venv .venv
+#   .venv/bin/pip install -r requirements-aarch64.txt \
+#       -i https://mirrors.cloud.tencent.com/pypi/simple/
+#   .venv/bin/python -m adapt.compat_check --out data/outbox/kylin-v10
+#   .venv/bin/python -m eval.run_eval      # 纯 CPU 口径复测，需推理后端就绪
