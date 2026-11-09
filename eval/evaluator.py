@@ -368,7 +368,7 @@ class EvalRunner:
         finally:
             memory = sampler.stop()
 
-        summary = aggregate(records, self.benchmark, ttft, memory)
+        summary = aggregate(records, self.benchmark, ttft, memory, task_scope=len(tasks))
         report = {
             "run_id": self.run_id,
             "timestamp": datetime.now().isoformat(timespec="seconds"),
@@ -378,6 +378,7 @@ class EvalRunner:
             "platform": f"{platform.system()} {platform.release()} / Python {sys.version.split()[0]}",
             "include_unsupported": self.include_unsupported,
             "task_count": len(tasks),
+            "is_full_benchmark": summary["is_full_benchmark"],
             "out_root": str(self.out_root.relative_to(PROJECT_ROOT)).replace("\\", "/"),
             "records": [r.to_dict() for r in records],
             "ttft": ttft,
@@ -404,7 +405,8 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- 时间：{report['timestamp']}",
         f"- 模型：`{report['model']}` @ {report['host']}",
         f"- 平台：{report['platform']}",
-        f"- 任务数：{report['task_count']}",
+        f"- 任务数：{report['task_count']}"
+        f"（{'全量 20 条' if report.get('is_full_benchmark') else '子集运行，不构成验收成绩'}）",
         f"- 产出目录：`{report['out_root']}`",
         "",
     ]
@@ -419,15 +421,25 @@ def render_markdown(report: dict[str, Any]) -> str:
         "| 指标 | 实测 | 目标 | 判定 | 口径 / 备注 |",
         "|---|---|---|---|---|",
     ]
+    mock_run = not report["is_real_measurement"]
     for m in s["metrics"]:
-        value = "不可测" if m["value"] is None else f"{m['value']}{m['unit']}"
+        if m["value"] is None:
+            value = "不可测"
+        elif m["unit"] == "ratio":
+            value = f"{m['value']:.1%}"
+        else:
+            value = f"{m['value']}{m['unit']}"
         sign = ">=" if m["op"] == ">=" else "<="
-        mark = {"pass": "✅", "fail": "❌", "unavailable": "⬜"}[m["status"]]
-        lines.append(f"| {m['name']} | {value} | {sign}{m['target']}{m['unit']} | {mark} | {m['note']} |")
+        target = f"{sign}{m['target']:.0%}" if m["unit"] == "ratio" else f"{sign}{m['target']}{m['unit']}"
+        # 脚本化 LLM 的"达标"没有任何意义，一律不判定，避免被截取截图当成成绩
+        mark = "⬜" if mock_run else {"pass": "✅", "fail": "❌", "unavailable": "⬜"}[m["status"]]
+        lines.append(f"| {m['name']} | {value} | {target} | {mark} | {m['note']} |")
+    simple_display = f"{s['simple_avg_elapsed_s']}s" if s["simple_avg_elapsed_s"] is not None else "—"
+    verdict = "（非实测，达标判定不成立）" if mock_run else ""
     lines += [
         "",
-        f"**达标 {s['passed']}/{s['total']} 项，其中已测 {s['measured']} 项**；"
-        f"任务状态分布：{s['status_counts']}；简单任务平均耗时 {s['simple_avg_elapsed_s']}s"
+        f"**达标 {s['passed']}/{s['total']} 项，其中已测 {s['measured']} 项{verdict}**；"
+        f"任务状态分布：{s['status_counts']}；简单任务平均耗时 {simple_display}"
         f"（目标 ≤{s['simple_target_s']}s）。",
         "",
         "口径说明：",

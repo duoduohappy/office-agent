@@ -196,7 +196,14 @@ def test_aggregate() -> None:
     check("平均耗时 = 10s", by_name["平均耗时"]["value"] == 10)
     check("简单任务均值被记录", s["simple_avg_elapsed_s"] == 10)
     check("跳过任务计入完成率分母", s["skipped"] == 7 and s["completed"] == 13)
-    check("分母口径说明写进报告", any("分母固定" in n for n in s["notes"]))
+    check("分母口径说明写进报告", any("分母为" in n for n in s["notes"]))
+    check("全量评测被正确标记", s["is_full_benchmark"] is True and s["total_tasks"] == 20)
+    subset = aggregate(records[:1], bm, ttft, memory, task_scope=1)
+    subset_values = {m["name"]: m["value"] for m in subset["metrics"]}
+    check("子集运行分母按本轮任务数", subset["total_tasks"] == 1
+          and subset_values["任务完成率"] == 1.0)
+    check("子集运行标注不构成验收成绩", subset["is_full_benchmark"] is False
+          and any("子集运行" in n for n in subset["notes"]))
     check("首 Token 与内存可取实测值", by_name["首 Token 延迟"]["status"] == "pass"
           and by_name["内存峰值"]["status"] == "pass")
     unavailable = aggregate(records, bm,
@@ -245,6 +252,8 @@ def test_runner_guards() -> None:
     check("显式 allow_mock 后可跑通单条闭环", len(report["records"]) == 1)
     check("报告标注为非实测", report["is_real_measurement"] is False)
     check("markdown 报告有醒目免责声明", "不构成方案 8.2 的指标实测" in render_markdown(report))
+    check("离线报告不给出任何达标判定", "达标判定不成立" in render_markdown(report)
+          and "✅ |" not in render_markdown(report))
     check("结果文件已落盘", any(tmp_results.glob("*.json")) and any(tmp_results.glob("*.md")))
     r0 = report["records"][0]
     check("会议闭环产出被记录", len(r0["artifacts"]) >= 2, str(r0["artifacts"]))

@@ -360,16 +360,23 @@ def aggregate(
     benchmark: dict[str, Any],
     ttft: dict[str, Any],
     memory: dict[str, Any],
+    task_scope: int | None = None,
 ) -> dict[str, Any]:
-    """汇总 7 项指标。分母口径固定，见 notes 字段。"""
+    """汇总 7 项指标。分母口径固定，见 notes 字段。
+
+    task_scope：本轮实际纳入的任务数。只跑子集时用它做分母，并标记
+    is_full_benchmark=False，避免把 1 条任务的结果显示成 1/20 完成率。
+    """
     th = benchmark["thresholds"]
     all_tasks = benchmark["tasks"]
+    total_tasks = task_scope if task_scope is not None else len(all_tasks)
+    is_full = total_tasks == len(all_tasks)
     executed = [r for r in records if r.status in {"completed", "failed", "error"}]
     skipped = [r for r in records if r.status == "skipped"]
     completed = [r for r in records if r.completed]
 
-    # 任务完成率：分母固定 20 条，跳过的算未完成（不能靠剔除难题抬高成绩）
-    completion_rate = len(completed) / len(all_tasks) if all_tasks else 0.0
+    # 任务完成率：全量评测分母固定 20 条，跳过的算未完成（不能靠剔除难题抬高成绩）
+    completion_rate = len(completed) / total_tasks if total_tasks else 0.0
 
     # 工具准确率：micro-averaged precision，只统计实际执行过的任务
     tool_scores = [score_tools(r.tool_calls, r.expected_tools) for r in executed if r.expected_tools]
@@ -394,7 +401,7 @@ def aggregate(
 
     metrics = [
         _metric("任务完成率", round(completion_rate, 4), ">=", th["task_completion_rate"], "ratio",
-                f"{len(completed)}/{len(all_tasks)}；跳过 {len(skipped)} 条计入未完成"),
+                f"{len(completed)}/{total_tasks}；跳过 {len(skipped)} 条计入未完成"),
         _metric("工具调用准确率", round(tool_precision, 4) if tool_precision is not None else None,
                 ">=", th["tool_accuracy"], "ratio",
                 f"LCS 对齐 {total_matched}/{total_actual} 次调用；recall={tool_recall}"),
@@ -404,7 +411,8 @@ def aggregate(
                 "<=", th["avg_steps_max"], "step", f"统计 {len(executed)} 条已执行任务的 LLM 循环轮数"),
         _metric("平均耗时", round(avg_elapsed, 2) if avg_elapsed is not None else None,
                 "<=", th["avg_elapsed_s_max"], "s",
-                f"简单任务均值 {simple_elapsed:.2f}s" if simple_elapsed is not None else "无已执行任务"),
+                f"简单任务均值 {simple_elapsed:.2f}s（目标 ≤{th['simple_elapsed_s_max']}s）"
+                if simple_elapsed is not None else "本轮无简单任务样本"),
         _metric("首 Token 延迟", ttft.get("value_s"), "<=", th["ttft_s_max"], "s", ttft.get("note", "")),
         _metric("内存峰值", memory.get("value_gb"), "<=", th["peak_rss_gb_max"], "GB", memory.get("note", "")),
     ]
@@ -419,11 +427,15 @@ def aggregate(
         "executed": len(executed),
         "skipped": len(skipped),
         "completed": len(completed),
+        "total_tasks": total_tasks,
+        "is_full_benchmark": is_full,
         "simple_avg_elapsed_s": round(simple_elapsed, 2) if simple_elapsed is not None else None,
         "simple_target_s": th["simple_elapsed_s_max"],
         "tool_recall": round(tool_recall, 4) if tool_recall is not None else None,
-        "notes": [
-            "任务完成率分母固定为 20 条；依赖未实现能力而跳过的任务记为未完成。",
+        "notes": ([
+            f"⚠️ 本轮仅纳入 {total_tasks}/{len(all_tasks)} 条任务，属子集运行，完成率不构成验收成绩。"
+        ] if not is_full else []) + [
+            f"任务完成率分母为 {total_tasks} 条；依赖未实现能力而跳过的任务记为未完成。",
             "工具准确率口径 = LCS 对齐后的 micro precision；recall 另列，防止少调工具刷分。",
             "平均完成步数 = LLM chat 调用轮数（Agent 循环步），不含纯工具内部处理。",
             "跳过的任务不进入工具准确率 / 格式 / 步数 / 耗时的分母，避免摊薄。",

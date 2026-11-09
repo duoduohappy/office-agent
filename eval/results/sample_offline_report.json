@@ -1,12 +1,13 @@
 {
-  "run_id": "eval_20261109_164122",
-  "timestamp": "2026-11-09T16:41:22",
+  "run_id": "eval_20261109_164400",
+  "timestamp": "2026-11-09T16:44:01",
   "is_real_measurement": false,
   "model": "unknown",
   "host": "http://127.0.0.1:11434",
   "platform": "Windows 11 / Python 3.13.14",
   "include_unsupported": false,
   "task_count": 1,
+  "is_full_benchmark": false,
   "out_root": "data/outbox/eval_sample",
   "records": [
     {
@@ -15,7 +16,7 @@
       "status": "completed",
       "reason": "",
       "completed": true,
-      "elapsed_s": 0.46,
+      "elapsed_s": 0.41,
       "llm_calls": 6,
       "tool_calls": [
         "read_document",
@@ -112,18 +113,18 @@
   "memory": {
     "value_gb": null,
     "status": "unavailable",
-    "note": "未检测到 Ollama 服务进程 RSS（2 次采样，仅 Python 51MB）；该值不能代表推理时内存峰值，故不计为实测"
+    "note": "未检测到 Ollama 服务进程 RSS（2 次采样，仅 Python 54MB）；该值不能代表推理时内存峰值，故不计为实测"
   },
   "summary": {
     "metrics": [
       {
         "name": "任务完成率",
-        "value": 0.05,
+        "value": 1.0,
         "target": 0.7,
         "unit": "ratio",
         "op": ">=",
-        "status": "fail",
-        "note": "1/20；跳过 0 条计入未完成"
+        "status": "pass",
+        "note": "1/1；跳过 0 条计入未完成"
       },
       {
         "name": "工具调用准确率",
@@ -154,12 +155,12 @@
       },
       {
         "name": "平均耗时",
-        "value": 0.46,
+        "value": 0.41,
         "target": 180,
         "unit": "s",
         "op": "<=",
         "status": "pass",
-        "note": "无已执行任务"
+        "note": "本轮无简单任务样本"
       },
       {
         "name": "首 Token 延迟",
@@ -177,10 +178,10 @@
         "unit": "GB",
         "op": "<=",
         "status": "unavailable",
-        "note": "未检测到 Ollama 服务进程 RSS（2 次采样，仅 Python 51MB）；该值不能代表推理时内存峰值，故不计为实测"
+        "note": "未检测到 Ollama 服务进程 RSS（2 次采样，仅 Python 54MB）；该值不能代表推理时内存峰值，故不计为实测"
       }
     ],
-    "passed": 4,
+    "passed": 5,
     "measured": 5,
     "total": 7,
     "status_counts": {
@@ -189,11 +190,14 @@
     "executed": 1,
     "skipped": 0,
     "completed": 1,
+    "total_tasks": 1,
+    "is_full_benchmark": false,
     "simple_avg_elapsed_s": null,
     "simple_target_s": 30,
     "tool_recall": 1.0,
     "notes": [
-      "任务完成率分母固定为 20 条；依赖未实现能力而跳过的任务记为未完成。",
+      "⚠️ 本轮仅纳入 1/20 条任务，属子集运行，完成率不构成验收成绩。",
+      "任务完成率分母为 1 条；依赖未实现能力而跳过的任务记为未完成。",
       "工具准确率口径 = LCS 对齐后的 micro precision；recall 另列，防止少调工具刷分。",
       "平均完成步数 = LLM chat 调用轮数（Agent 循环步），不含纯工具内部处理。",
       "跳过的任务不进入工具准确率 / 格式 / 步数 / 耗时的分母，避免摊薄。"
