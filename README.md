@@ -47,15 +47,24 @@
 powershell -ExecutionPolicy Bypass -File scripts\set_disk_env.ps1
 # 重开终端后生效
 
-# 2. 安装 Ollama 并拉模型（~4.7GB，落在 D:\Projects\.cache\ollama）
-ollama pull qwen2.5:7b-instruct-q4_K_M
+# 2. 安装 Ollama：程序本体和模型权重都要指定到 D 盘
+#    先下载 https://ollama.com/download/windows，然后：
+powershell -ExecutionPolicy Bypass -File scripts\install_ollama.ps1 -Installer "<OllamaSetup.exe 完整路径>"
+#    脚本内部用官方 /DIR 参数把程序装到 D:\Projects\.cache\ollama\app，
+#    并再次确认 OLLAMA_MODELS=D:\Projects\.cache\ollama\models
+#    ⚠️ 装完必须重开终端；若托盘进程已在跑，先退出再重启，否则它读不到环境变量
 
-# 3. 依赖
+# 3. 拉模型（~4.7GB，落在 D:\Projects\.cache\ollama\models\blobs）
+ollama pull qwen2.5:7b-instruct-q4_K_M
+#    验证真的落在 D 盘：
+#    powershell: Get-ChildItem D:\Projects\.cache\ollama\models\blobs | Measure-Object Length -Sum
+
+# 4. 依赖
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
 
-# 4. 自检 + 运行
+# 5. 自检 + 运行
 python main.py --check
 python main.py --pipeline data/inbox/sample_meeting.txt --title "2026年第11次部门例会纪要"
 python main.py                      # 交互模式
