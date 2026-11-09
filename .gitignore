@@ -7,3 +7,9 @@ tests/_tmp_out/
 .venv/
 __pycache__/
 *.pyc
+
+# 真实评测报告含本机环境信息，不入库；样例报告显式保留
+eval/results/*.json
+eval/results/*.md
+!eval/results/sample_offline_report.json
+!eval/results/sample_offline_report.md

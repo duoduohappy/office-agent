@@ -20,6 +20,7 @@ import threading
 import time
 import urllib.request
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -291,6 +292,24 @@ class MemorySampler:
 
 
 # ---------------------------------------------------------------- 单条记录
+_PROJECT_ROOT = Path(__file__).resolve().parents[1]
+_ROOT_FORMS = tuple(dict.fromkeys((str(_PROJECT_ROOT), _PROJECT_ROOT.as_posix())))
+
+
+def scrub_local_paths(text: str) -> str:
+    """评测报告可能被公开：把项目根的绝对路径改写为项目内相对路径。
+
+    只作用于序列化输出；record.answer 原文仍保持完整，供关键字评分使用。
+    """
+    if not text:
+        return text
+    for root in _ROOT_FORMS:
+        for sep in ("\\", "/"):
+            text = text.replace(root + sep, "")
+        text = text.replace(root, "")  # 末尾或独立出现的根路径
+    return text
+
+
 @dataclass
 class TaskRecord:
     task_id: str
@@ -312,11 +331,11 @@ class TaskRecord:
     def to_dict(self) -> dict[str, Any]:
         return {
             "task_id": self.task_id, "difficulty": self.difficulty,
-            "status": self.status, "reason": self.reason,
+            "status": self.status, "reason": scrub_local_paths(self.reason),
             "completed": self.completed, "elapsed_s": round(self.elapsed_s, 2),
             "llm_calls": self.llm_calls, "tool_calls": self.tool_calls,
             "expected_tools": self.expected_tools,
-            "answer_preview": self.answer[:300], "artifacts": self.artifacts,
+            "answer_preview": scrub_local_paths(self.answer[:300]), "artifacts": self.artifacts,
             "checks": self.checks, "format_ok": self.format_ok, "format_total": self.format_total,
         }
 

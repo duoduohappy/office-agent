@@ -26,7 +26,7 @@ from eval.evaluator import (
 )
 from eval.fixtures import ensure_fixtures
 from eval.metrics import (
-    TaskRecord, aggregate, lcs_length, score_tools,
+    TaskRecord, aggregate, lcs_length, score_tools, scrub_local_paths,
 )
 from tests.test_pipeline_offline import ScriptedLLM
 from tools import doc_tools
@@ -262,6 +262,19 @@ def test_runner_guards() -> None:
     check("评测报告含完整七项指标", len(report["summary"]["metrics"]) == 7)
 
 
+def test_report_no_absolute_paths() -> None:
+    """报告会被公开，序列化时不得带出本机绝对路径；评分原文不受影响。"""
+    root = str(ROOT)
+    answer = "产出：" + root + "\\data\\outbox\\a.docx、" + ROOT.as_posix() + "/data/outbox/b.xlsx"
+    rec = TaskRecord(task_id="X", difficulty="simple", answer=answer, reason="失败于 " + root)
+    d = rec.to_dict()
+    check("报告脱敏：answer_preview 无绝对路径", ":\\" not in d["answer_preview"] and "D:/" not in d["answer_preview"], d["answer_preview"])
+    check("报告脱敏：reason 无绝对路径", root not in d["reason"], d["reason"])
+    check("报告脱敏：相对路径仍可读", "a.docx" in d["answer_preview"] and "outbox" in d["answer_preview"])
+    check("报告脱敏：评分原文保持完整", rec.answer == answer and len(rec.answer) > len(d["answer_preview"]))
+    check("脱敏函数对非路径文本无副作用", scrub_local_paths("任务完成，共 3 步") == "任务完成，共 3 步")
+
+
 def main() -> int:
     test_benchmark_schema()
     test_fixtures()
@@ -271,6 +284,7 @@ def main() -> int:
     test_aggregate()
     test_memory_sampling()
     test_runner_guards()
+    test_report_no_absolute_paths()
     print(f"\n{'=' * 46}\n通过 {PASS} / 失败 {FAIL} / 共 {PASS + FAIL}")
     return 1 if FAIL else 0
 

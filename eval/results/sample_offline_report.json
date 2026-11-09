@@ -1,6 +1,6 @@
 {
-  "run_id": "eval_20261109_164400",
-  "timestamp": "2026-11-09T16:44:01",
+  "run_id": "eval_20261109_174400",
+  "timestamp": "2026-11-09T17:44:01",
   "is_real_measurement": false,
   "model": "unknown",
   "host": "http://127.0.0.1:11434",
@@ -16,7 +16,7 @@
       "status": "completed",
       "reason": "",
       "completed": true,
-      "elapsed_s": 0.41,
+      "elapsed_s": 0.47,
       "llm_calls": 6,
       "tool_calls": [
         "read_document",
@@ -30,7 +30,7 @@
         "write_todos_xlsx",
         "write_notice_txt"
       ],
-      "answer_preview": "任务：把「会议录音转写稿」整理成纪要，提取待办，起草会议通知\n计划：3/4 步完成\n会议处理：2 片段，Map-Reduce，2 条待办\n产出：D:\\Projects\\office-agent\\data\\outbox\\eval_sample\\M07\\会议纪要.docx、D:\\Projects\\office-agent\\data\\outbox\\eval_sample\\M07\\待办清单.xlsx、D:\\Projects\\office-agent\\data\\outbox\\eval_sample\\M07\\notices\\会议通知.txt\n校验通过（0 项）\n校验通过（0 项）",
+      "answer_preview": "任务：把「会议录音转写稿」整理成纪要，提取待办，起草会议通知\n计划：3/4 步完成\n会议处理：2 片段，Map-Reduce，2 条待办\n产出：data\\outbox\\eval_sample\\M07\\会议纪要.docx、data\\outbox\\eval_sample\\M07\\待办清单.xlsx、data\\outbox\\eval_sample\\M07\\notices\\会议通知.txt\n校验通过（0 项）\n校验通过（0 项）",
       "artifacts": [
         "data/outbox/eval_sample/M07/notices/会议通知.txt",
         "data/outbox/eval_sample/M07/会议纪要.docx",
@@ -155,7 +155,7 @@
       },
       {
         "name": "平均耗时",
-        "value": 0.41,
+        "value": 0.47,
         "target": 180,
         "unit": "s",
         "op": "<=",
