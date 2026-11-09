@@ -3,7 +3,12 @@
 用法：
   python main.py                      # 交互式 REPL
   python main.py "总结 data/inbox 下的文件"   # 单任务
-  python main.py --check              # 环境自检（Ollama/模型/目录）
+  python main.py --check              # 环境自检（Ollama/模型/目录/协议层）
+  python main.py --mcp                # 作为 MCP stdio 服务端
+  python main.py --mcp-http 127.0.0.1:8765
+  python main.py --a2a 127.0.0.1:8770
+  python main.py --edge-selftest      # 端边云三节点本地联调
+  python main.py --index-vectors      # 重建 Chroma 向量索引
 """
 
 from __future__ import annotations
@@ -18,15 +23,18 @@ from core.llm_client import OllamaClient
 from core.prompt_builder import build_system_prompt
 from core.tool_registry import ToolRegistry
 from memory.structured_db import StructuredMemory
-from tools import audio_tools, doc_tools, file_tools, knowledge_tools
+from tools import audio_tools, doc_tools, file_tools, knowledge_tools, rag_tools
 
 
 def build_registry() -> ToolRegistry:
+    """CLI / MCP 共用。评测器另有一套固定 registry，不在此处扩展，
+    以免新增工具悄悄改变两轮真实评测的系统提示与成绩口径。"""
     registry = ToolRegistry()
     registry.extend(file_tools.FILE_TOOLS)
     registry.extend(doc_tools.DOC_TOOLS)
     registry.extend(audio_tools.AUDIO_TOOLS)
     registry.extend(knowledge_tools.KNOWLEDGE_TOOLS)
+    registry.extend(rag_tools.RAG_TOOLS)
     return registry
 
 
@@ -111,6 +119,17 @@ def check_env() -> int:
     else:
         print("[!!] OLLAMA_MODELS 未设置，模型会下载到 C 盘！先运行 scripts/set_disk_env.ps1")
         ok = False
+
+    # 协议层 / 向量库状态只做展示，不影响自检通过与否（它们是可选能力）
+    from memory.vector_store import get_store
+    from protocols.mcp_server import MCPServer
+
+    stats = get_store().stats()
+    backend = "真实 Chroma" if stats["is_real_chroma"] else "降级：标准库余弦"
+    print(f"[--] 向量库后端：{backend}（embedding 非语义模型）")
+    if stats["init_error"]:
+        print(f"     降级原因：{stats['init_error']}")
+    print(f"[--] MCP 工具数：{len(MCPServer().tools_list())}")
     return 0 if ok else 1
 
 
@@ -124,10 +143,46 @@ def main() -> int:
     parser.add_argument("--attendees", default="", help="参会人员，逗号分隔")
     parser.add_argument("--group", default="全体成员", help="通知收件人组 / 部门名")
     parser.add_argument("--out-dir", default="data/outbox", help="产出目录（默认 data/outbox）")
+    parser.add_argument("--mcp", action="store_true", help="以 MCP stdio 服务端模式启动")
+    parser.add_argument("--mcp-http", metavar="HOST:PORT", help="以 MCP HTTP JSON-RPC 模式启动")
+    parser.add_argument("--a2a", metavar="HOST:PORT", help="以 A2A 服务端模式启动")
+    parser.add_argument("--edge-selftest", action="store_true", help="端边云三节点本地联调自测")
+    parser.add_argument("--index-vectors", action="store_true", help="重建本地向量索引")
+    parser.add_argument("--allow-dangerous", action="store_true", help="MCP 模式下允许有副作用工具")
     args = parser.parse_args()
 
     if args.check:
         return check_env()
+
+    # ---- 协议层 / 协同层入口（都不需要 Ollama）----
+    if args.mcp or args.mcp_http:
+        from protocols import mcp_server
+
+        extra = []
+        if args.allow_dangerous:
+            extra.append("--allow-dangerous")
+        if args.mcp_http:
+            extra += ["--http", args.mcp_http]
+        return mcp_server.main(extra)
+
+    if args.a2a:
+        from protocols import a2a
+
+        return a2a.main(["--http", args.a2a])
+
+    if args.edge_selftest:
+        import json as _json
+        from edge import coordination
+
+        print(_json.dumps(coordination.self_test(), ensure_ascii=False, indent=2))
+        return 0
+
+    if args.index_vectors:
+        import json as _json
+        from memory.vector_store import get_store
+
+        print(_json.dumps(get_store().index_directory(), ensure_ascii=False, indent=2))
+        return 0
 
     def seed_contacts(mem: StructuredMemory) -> None:
         """演示用本地通讯录；真实环境从企业通讯录 API 导入。"""

@@ -2,8 +2,18 @@
 # Run once:  powershell -ExecutionPolicy Bypass -File scripts\set_disk_env.ps1
 # Requires a NEW shell afterwards for the variables to take effect.
 
+# Derive the cache root from the script location; never hardcode a local drive.
+# Override with -CacheRoot or the OA_CACHE_ROOT environment variable.
+param([string]$CacheRoot = "")
+
 $ErrorActionPreference = "Stop"
-$CacheRoot = "D:\Projects\.cache"
+if (-not $CacheRoot) {
+    $CacheRoot = if ($env:OA_CACHE_ROOT) {
+        $env:OA_CACHE_ROOT
+    } else {
+        Join-Path (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)) ".cache"
+    }
+}
 
 $dirs = @(
     "$CacheRoot\ollama\models",

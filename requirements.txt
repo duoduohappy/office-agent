@@ -5,4 +5,12 @@ openpyxl>=3.1
 python-pptx>=0.6
 pypdf>=5.0
 
-# 核心 harness / llm_client / 工具注册表 / 解析器只用标准库，无需额外依赖
+# 向量库（方案 4.3 / 4.6）：memory/vector_store.py 的真实 Chroma 后端。
+# 这是**可选重依赖**：未安装时自动降级到纯标准库余弦索引，并在所有结果里
+# 标注 backend=fallback-hash-cosine，绝不把降级结果冒充 Chroma。
+# Python 3.13 下官方 PyPI 源下载很慢，建议用国内镜像：
+#   pip install -r requirements.txt -i https://mirrors.cloud.tencent.com/pypi/simple/
+chromadb>=1.0
+
+# 核心 harness / llm_client / 工具注册表 / 解析器 / MCP / A2A / 端边云协同
+# 都只用标准库，无需额外依赖；Chroma 持久化目录固定在 data/workspace/chroma。

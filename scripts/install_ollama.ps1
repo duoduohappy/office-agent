@@ -2,7 +2,7 @@
 #
 # Usage:
 #   powershell -ExecutionPolicy Bypass -File scripts\install_ollama.ps1
-#   powershell -ExecutionPolicy Bypass -File scripts\install_ollama.ps1 -Installer "C:\Users\me\Downloads\OllamaSetup.exe"
+#   powershell -ExecutionPolicy Bypass -File scripts\install_ollama.ps1 -Installer "<path-to>\OllamaSetup.exe"
 #
 # Docs: https://docs.ollama.com/windows
 #   /DIR=...          -> app binaries location
@@ -10,13 +10,22 @@
 
 param(
     [string]$Installer = "",
-    [string]$AppDir = "D:\Projects\.cache\ollama\app",
-    [string]$ModelsDir = "D:\Projects\.cache\ollama\models"
+    [string]$AppDir = "",
+    [string]$ModelsDir = ""
 )
 
 $ErrorActionPreference = "Stop"
+# Derive the cache root from the script location; never hardcode a local drive.
+# Override with -CacheRoot or the OA_CACHE_ROOT environment variable.
+$CacheRoot = if ($env:OA_CACHE_ROOT) {
+    $env:OA_CACHE_ROOT
+} else {
+    Join-Path (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)) ".cache"
+}
+if (-not $AppDir) { $AppDir = Join-Path $CacheRoot "ollama\app" }
+if (-not $ModelsDir) { $ModelsDir = Join-Path $CacheRoot "ollama\models" }
 
-Write-Host "=== Ollama D: drive install ==="
+Write-Host "=== Ollama non-system-drive install ==="
 Write-Host "App binaries : $AppDir"
 Write-Host "Model weights: $ModelsDir"
 Write-Host ""
@@ -34,7 +43,7 @@ if (-not $Installer) {
     $candidates = @(
         (Join-Path $env:USERPROFILE "Downloads\OllamaSetup.exe"),
         (Join-Path $env:USERPROFILE "Downloads\OllamaSetup (1).exe"),
-        "D:\Projects\.cache\ollama\OllamaSetup.exe"
+        (Join-Path $CacheRoot "ollama\OllamaSetup.exe")
     )
     foreach ($c in $candidates) {
         if (Test-Path $c) { $Installer = $c; break }
@@ -68,10 +77,10 @@ Write-Host "  1. Open a NEW terminal (env vars apply to new processes only)"
 Write-Host "  2. ollama --version"
 Write-Host "  3. echo `$env:OLLAMA_MODELS     # must print $ModelsDir"
 Write-Host "  4. ollama pull qwen2.5:7b-instruct-q4_K_M   # ~4.7 GB, lands on D:"
-Write-Host "  5. cd D:\Projects\office-agent; .venv\Scripts\python.exe main.py --check"
+Write-Host ("  5. cd " + (Split-Path -Parent $PSScriptRoot) + "; .venv\Scripts\python.exe main.py --check")
 Write-Host ""
-Write-Host "Verify the pull landed on D:  Get-ChildItem '$ModelsDir\blobs' | Measure-Object Length -Sum"
-Write-Host "If C:\Users\<you>\.ollama\models grows instead, the tray app was not restarted."
+Write-Host "Verify the pull landed on the cache drive:  Get-ChildItem '$ModelsDir\blobs' | Measure-Object Length -Sum"
+Write-Host 'If %USERPROFILE%\.ollama\models grows instead, the tray app was not restarted.'
 Write-Host ""
 Write-Host "Note: %LOCALAPPDATA%\Ollama (logs + downloaded updates) and %TEMP%\ollama*"
 Write-Host "      still live on C: and are small. There is no supported env var to move them."
