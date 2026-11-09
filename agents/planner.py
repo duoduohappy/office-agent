@@ -16,12 +16,12 @@ from core.output_parser import OutputParseError, extract_json
 PLAN_SYSTEM_PROMPT = """你是一个任务规划器。把用户的办公任务拆成可执行步骤，只输出 JSON。
 
 输出格式（严格遵守）：
-{
+{{
   "goal": "一句话概括最终要交付的东西",
   "steps": [
     {{"id": 1, "title": "简短动作描述", "agent": "{agents}", "tool_hint": "预期使用的工具名或空字符串", "expected": "这一步的产出是什么"}}
   ]
-}
+}}
 
 规则：
 - 步骤数量控制在 2 到 {max_steps} 步，能合并的合并，太细则调用开销大。

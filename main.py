@@ -11,18 +11,21 @@ from __future__ import annotations
 import argparse
 import sys
 
+from agents.orchestrator import Orchestrator
 from core.config import config
 from core.harness import AgentLoop, RunResult
 from core.llm_client import OllamaClient
 from core.prompt_builder import build_system_prompt
 from core.tool_registry import ToolRegistry
 from memory.structured_db import StructuredMemory
-from tools import file_tools
+from tools import audio_tools, doc_tools, file_tools
 
 
 def build_registry() -> ToolRegistry:
     registry = ToolRegistry()
     registry.extend(file_tools.FILE_TOOLS)
+    registry.extend(doc_tools.DOC_TOOLS)
+    registry.extend(audio_tools.AUDIO_TOOLS)
     return registry
 
 
@@ -56,6 +59,28 @@ def build_agent(model: str | None = None, agent_name: str = "GeneralAgent") -> A
     return Loop(llm, registry, max_steps=cfg.max_steps, system_prompt=system_prompt, on_step=on_step), memory
 
 
+def _user_env(name: str) -> str:
+    """读用户级环境变量。
+
+    set_disk_env.ps1 写入的是注册表 HKCU\\Environment，当前已打开的终端
+    不一定能立刻看到；自检时把注册表值也读出来，避免误报"未配置"。
+    """
+    import os
+
+    current = os.getenv(name, "")
+    if current:
+        return current
+    if sys.platform == "win32":
+        import winreg
+
+        try:
+            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Environment") as key:
+                return str(winreg.QueryValueEx(key, name)[0])
+        except OSError:
+            return ""
+    return ""
+
+
 def check_env() -> int:
     """环境自检：Ollama 服务、模型、目录、磁盘缓存重定向。"""
     ok = True
@@ -78,9 +103,10 @@ def check_env() -> int:
     config.ensure_dirs()
     print(f"[OK] 数据目录：{config.data_dir}")
     import os
-    ollama_models = os.getenv("OLLAMA_MODELS", "")
+    ollama_models = _user_env("OLLAMA_MODELS")
     if ollama_models:
-        print(f"[OK] 模型权重已重定向到：{ollama_models}")
+        source = "当前会话" if os.getenv("OLLAMA_MODELS") else "用户级配置，新终端生效"
+        print(f"[OK] 模型权重已重定向到：{ollama_models}（{source}）")
     else:
         print("[!!] OLLAMA_MODELS 未设置，模型会下载到 C 盘！先运行 scripts/set_disk_env.ps1")
         ok = False
@@ -92,13 +118,49 @@ def main() -> int:
     parser.add_argument("task", nargs="?", help="要执行的任务；不填则进入交互模式")
     parser.add_argument("--model", help="覆盖默认模型名")
     parser.add_argument("--check", action="store_true", help="环境自检")
+    parser.add_argument("--pipeline", metavar="TRANSCRIPT", help="跑完整会议闭环（传转写稿路径）")
+    parser.add_argument("--title", default="部门例会纪要", help="会议纪要标题")
+    parser.add_argument("--attendees", default="", help="参会人员，逗号分隔")
+    parser.add_argument("--group", default="全体成员", help="通知收件人组 / 部门名")
     args = parser.parse_args()
 
     if args.check:
         return check_env()
 
+    def seed_contacts(mem: StructuredMemory) -> None:
+        """演示用本地通讯录；真实环境从企业通讯录 API 导入。"""
+        if mem.all_contacts():
+            return
+        for name, email, dept in [
+            ("张伟", "zhangwei@example.gov.cn", "综合办"),
+            ("李娜", "lina@example.gov.cn", "综合办"),
+            ("王强", "wangqiang@example.gov.cn", "技术科"),
+        ]:
+            mem.add_contact(name, email, dept)
+
+    # --pipeline：跑方案 2.2 的完整会议闭环
+    if args.pipeline:
+        config.ensure_dirs()
+        registry = build_registry()
+        memory = StructuredMemory(config.memory_db)
+        seed_contacts(memory)
+        llm = OllamaClient(
+            model=args.model or config.model, host=config.ollama_host,
+            temperature=config.temperature, num_ctx=config.num_ctx, timeout=config.request_timeout,
+        )
+        orch = Orchestrator(llm, registry, memory)
+        result = orch.run_meeting_pipeline(
+            args.pipeline, title=args.title, attendees=args.attendees,
+            recipients_group=args.group,
+        )
+        print(f"\n{'=' * 60}\n{result.summary()}\n{'=' * 60}")
+        print(f"[闭环状态] {'成功' if result.ok else '存在未解决问题'}")
+        memory.close()
+        return 0 if result.ok else 1
+
     agent, memory = build_agent(args.model)
     config.ensure_dirs()
+    seed_contacts(memory)
 
     def show(result: RunResult) -> None:
         print(f"\n{'=' * 60}\n{result.answer}\n{'=' * 60}")

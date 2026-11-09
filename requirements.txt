@@ -1,6 +1,8 @@
-# 当前阶段核心零依赖（llm_client 只用标准库 urllib）
-# 文档工具在阶段 2 启用时取消注释
-# python-docx>=1.1
-# openpyxl>=3.1
-# python-pptx>=0.6
-# PyMuPDF>=1.24
+# 文档处理（方案 5 技术栈）
+# Python 3.13 / 国产 ARM 平台兼容性：PDF 用纯 Python 的 pypdf 替代 PyMuPDF
+python-docx>=1.1
+openpyxl>=3.1
+python-pptx>=0.6
+pypdf>=5.0
+
+# 核心 harness / llm_client / 工具注册表 / 解析器只用标准库，无需额外依赖

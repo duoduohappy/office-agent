@@ -29,6 +29,12 @@ CREATE TABLE IF NOT EXISTS preferences (
     value TEXT NOT NULL,
     updated_at REAL NOT NULL
 );
+CREATE TABLE IF NOT EXISTS contacts (
+    name TEXT PRIMARY KEY,
+    email TEXT NOT NULL,
+    department TEXT NOT NULL DEFAULT '',
+    updated_at REAL NOT NULL
+);
 CREATE INDEX IF NOT EXISTS idx_audit_task ON audit_log(task);
 CREATE INDEX IF NOT EXISTS idx_audit_ts ON audit_log(ts);
 """
@@ -94,6 +100,36 @@ class StructuredMemory:
     def all_prefs(self) -> dict[str, str]:
         rows = self.conn.execute("SELECT key, value FROM preferences").fetchall()
         return {r["key"]: r["value"] for r in rows}
+
+    # ---------------- 本地通讯录（方案 4.4） ----------------
+    def add_contact(self, name: str, email: str, department: str = "") -> None:
+        self.conn.execute(
+            "INSERT INTO contacts (name, email, department, updated_at) VALUES (?, ?, ?, ?)"
+            " ON CONFLICT(name) DO UPDATE SET email = excluded.email,"
+            " department = excluded.department, updated_at = excluded.updated_at",
+            (name, email, department, time.time()),
+        )
+        self.conn.commit()
+
+    def lookup_contact(self, name: str) -> dict[str, Any] | None:
+        row = self.conn.execute(
+            "SELECT * FROM contacts WHERE name = ? OR name LIKE ?", (name, f"%{name}%")
+        ).fetchone()
+        return dict(row) if row else None
+
+    def resolve_group(self, group: str) -> list[dict[str, Any]]:
+        """按部门解析收件人组；'全体成员' 返回全部。"""
+        if group in {"全体成员", "全体", "所有人"}:
+            rows = self.conn.execute("SELECT * FROM contacts ORDER BY name").fetchall()
+        else:
+            rows = self.conn.execute(
+                "SELECT * FROM contacts WHERE department = ? OR department LIKE ? ORDER BY name",
+                (group, f"%{group}%"),
+            ).fetchall()
+        return [dict(r) for r in rows]
+
+    def all_contacts(self) -> list[dict[str, Any]]:
+        return [dict(r) for r in self.conn.execute("SELECT * FROM contacts ORDER BY name").fetchall()]
 
     def close(self) -> None:
         self.conn.close()
