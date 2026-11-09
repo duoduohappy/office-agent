@@ -1,0 +1,360 @@
+{
+  "version": "1.0",
+  "source": "docs/tech-plan.md §8.1 评测任务集设计（简单 5 / 中等 8 / 复杂 7）",
+  "notes": [
+    "占位符 {fixture:NAME} 由 fixtures.ensure_fixtures() 替换为绝对路径，{outdir} 替换为本次任务独立输出目录。",
+    "评分采用确定性规则，不使用 LLM-as-judge：端侧只有 7B，让被测模型自评不可信、也不可复现。",
+    "requires 非空表示依赖尚未实现的能力。这类任务默认跳过并计入任务完成率分母（未完成），但不计入工具准确率/格式正确率/步数/耗时分母，避免摊薄指标。",
+    "工具名全部取自 core/tool_registry.py 已注册工具；复杂任务的 expectations 是方案设定的理想答案，仅作差距参考。"
+  ],
+  "thresholds": {
+    "task_completion_rate": 0.70,
+    "tool_accuracy": 0.85,
+    "format_correct_rate": 0.80,
+    "avg_steps_max": 6,
+    "avg_elapsed_s_max": 180,
+    "simple_elapsed_s_max": 30,
+    "ttft_s_max": 1.5,
+    "peak_rss_gb_max": 6.0
+  },
+  "tasks": [
+    {
+      "id": "S01",
+      "difficulty": "simple",
+      "capability": "单工具调用 / Word 文档读取与要点总结",
+      "instruction": "读取 {fixture:policy_doc}，用简洁中文总结这份文件的核心要点。",
+      "route": "generic",
+      "route_args": {},
+      "requires": [],
+      "expected_tools": ["read_document"],
+      "grading": {
+        "answer_keywords": ["端侧", "内网", "Qwen2.5"],
+        "answer_keywords_mode": "any",
+        "min_answer_chars": 40,
+        "artifacts": []
+      }
+    },
+    {
+      "id": "S02",
+      "difficulty": "simple",
+      "capability": "单工具调用 / 目录列举",
+      "instruction": "列出 data/inbox/eval_fixtures 目录下的所有文件名。",
+      "route": "generic",
+      "route_args": {},
+      "requires": [],
+      "expected_tools": ["list_dir"],
+      "grading": {
+        "answer_keywords": ["policy_doc.docx", "sales_2026_10.xlsx", "meeting_short.txt"],
+        "answer_keywords_mode": "any",
+        "min_answer_chars": 15,
+        "artifacts": []
+      }
+    },
+    {
+      "id": "S03",
+      "difficulty": "simple",
+      "capability": "单工具调用 / 纯文本读取",
+      "instruction": "读取 {fixture:plain_txt}，说明里面列了哪几条要求。",
+      "route": "generic",
+      "route_args": {},
+      "requires": [],
+      "expected_tools": ["read_file"],
+      "grading": {
+        "answer_keywords": ["草稿", "确认", "内网"],
+        "answer_keywords_mode": "any",
+        "min_answer_chars": 30,
+        "artifacts": []
+      }
+    },
+    {
+      "id": "S04",
+      "difficulty": "simple",
+      "capability": "单工具调用 / Excel 数据读取",
+      "instruction": "读取 {fixture:sales_xlsx}，说明 10 月销售额最高的部门以及合计数。",
+      "route": "generic",
+      "route_args": {},
+      "requires": [],
+      "expected_tools": ["read_document"],
+      "grading": {
+        "answer_keywords": ["技术科", "641.1", "342"],
+        "answer_keywords_mode": "any",
+        "min_answer_chars": 25,
+        "artifacts": []
+      }
+    },
+    {
+      "id": "S05",
+      "difficulty": "simple",
+      "capability": "单工具调用 / PDF 解析",
+      "instruction": "读取 {fixture:notice_pdf}，用中文概括这份英文通知的主要内容。",
+      "route": "generic",
+      "route_args": {},
+      "requires": [],
+      "expected_tools": ["read_document"],
+      "grading": {
+        "answer_keywords": ["本地", "内网", "Qwen2.5", "Endpoint"],
+        "answer_keywords_mode": "any",
+        "min_answer_chars": 30,
+        "artifacts": []
+      }
+    },
+    {
+      "id": "M01",
+      "difficulty": "medium",
+      "capability": "多步骤 / 会议转写稿 → 纪要 + 待办 + 通知",
+      "instruction": "把 {fixture:meeting_short} 整理成会议纪要，提取待办清单，并起草会议通知。产出保存到 {outdir}。",
+      "route": "pipeline",
+      "route_args": {"transcript": "{fixture:meeting_short}", "title": "2026年第11次部门例会纪要"},
+      "requires": [],
+      "expected_tools": ["read_document", "write_minutes_docx", "write_todos_xlsx", "write_notice_txt"],
+      "grading": {
+        "answer_keywords": [],
+        "answer_keywords_mode": "any",
+        "min_answer_chars": 0,
+        "artifacts": [
+          {"suffix": ".docx", "min_bytes": 3000, "keywords": ["会议主要内容", "待办"], "keywords_mode": "all", "format": "gb9704"},
+          {"suffix": ".xlsx", "min_bytes": 2000, "keywords": ["责任人", "完成时限"], "keywords_mode": "all", "format": "xlsx_headers"}
+        ]
+      }
+    },
+    {
+      "id": "M02",
+      "difficulty": "medium",
+      "capability": "多步骤 / 数据读取 + 汇总表生成",
+      "instruction": "读取 {fixture:sales_xlsx}，按部门汇总 10 月销售额，把汇总结果写成文本文件 {outdir}/销售汇总.txt，并在结论里说明总额。",
+      "route": "generic",
+      "route_args": {},
+      "requires": [],
+      "expected_tools": ["read_document", "write_file"],
+      "grading": {
+        "answer_keywords": ["641.1", "合计", "技术科"],
+        "answer_keywords_mode": "any",
+        "min_answer_chars": 20,
+        "artifacts": [
+          {"suffix": ".txt", "min_bytes": 20, "keywords": ["技术科", "合计"], "keywords_mode": "all", "format": null}
+        ]
+      }
+    },
+    {
+      "id": "M03",
+      "difficulty": "medium",
+      "capability": "多步骤 / 会议内容 → 结构化待办",
+      "instruction": "从 {fixture:meeting_short} 中提取全部待办事项（责任人、事项、时限），生成待办清单 Excel 到 {outdir}/待办清单.xlsx。",
+      "route": "generic",
+      "route_args": {},
+      "requires": [],
+      "expected_tools": ["read_document", "write_todos_xlsx"],
+      "grading": {
+        "answer_keywords": [],
+        "answer_keywords_mode": "any",
+        "min_answer_chars": 0,
+        "artifacts": [
+          {"suffix": ".xlsx", "min_bytes": 2000, "keywords": ["责任人", "完成时限"], "keywords_mode": "all", "format": "xlsx_headers"}
+        ]
+      }
+    },
+    {
+      "id": "M04",
+      "difficulty": "medium",
+      "capability": "多步骤 / 通知起草与落盘",
+      "instruction": "根据 {fixture:plain_txt} 的内容起草一份内部通知，保存到 {outdir}/内部通知.txt，落款用办公室。",
+      "route": "generic",
+      "route_args": {},
+      "requires": [],
+      "expected_tools": ["read_file", "write_notice_txt"],
+      "grading": {
+        "answer_keywords": [],
+        "answer_keywords_mode": "any",
+        "min_answer_chars": 0,
+        "artifacts": [
+          {"suffix": ".txt", "min_bytes": 60, "keywords": ["办公室", "通知"], "keywords_mode": "all", "format": null}
+        ]
+      }
+    },
+    {
+      "id": "M05",
+      "difficulty": "medium",
+      "capability": "多步骤 / 跨格式对照",
+      "instruction": "分别读取 {fixture:policy_doc} 和 {fixture:sales_xlsx}，指出两份材料在「时间节点」上的对应关系，把结论写到 {outdir}/对照说明.txt。",
+      "route": "generic",
+      "route_args": {},
+      "requires": [],
+      "expected_tools": ["read_document", "read_document", "write_file"],
+      "grading": {
+        "answer_keywords": ["11月30日", "10月", "2026"],
+        "answer_keywords_mode": "any",
+        "min_answer_chars": 20,
+        "artifacts": [
+          {"suffix": ".txt", "min_bytes": 20, "keywords": [], "keywords_mode": "all", "format": null}
+        ]
+      }
+    },
+    {
+      "id": "M06",
+      "difficulty": "medium",
+      "capability": "多步骤 / 文档内容 → 公文格式纪要",
+      "instruction": "把 {fixture:policy_doc} 的内容整理成一份公文格式的会议纪要，保存到 {outdir}/会议纪要.docx，标题用「端侧智能办公建设专题会议纪要」。",
+      "route": "generic",
+      "route_args": {},
+      "requires": [],
+      "expected_tools": ["read_document", "write_minutes_docx"],
+      "grading": {
+        "answer_keywords": [],
+        "answer_keywords_mode": "any",
+        "min_answer_chars": 0,
+        "artifacts": [
+          {"suffix": ".docx", "min_bytes": 3000, "keywords": ["端侧智能办公", "会议主要内容"], "keywords_mode": "all", "format": "gb9704"}
+        ]
+      }
+    },
+    {
+      "id": "M07",
+      "difficulty": "medium",
+      "capability": "多步骤 / 长稿 Map-Reduce + 完整闭环",
+      "instruction": "把长篇会议转写稿 {fixture:meeting_long} 整理成纪要，提取待办，起草通知，产出保存到 {outdir}。",
+      "route": "pipeline",
+      "route_args": {"transcript": "{fixture:meeting_long}", "title": "2026年第12次部门例会纪要"},
+      "requires": [],
+      "expected_tools": ["read_document", "write_minutes_docx", "write_todos_xlsx", "write_notice_txt"],
+      "grading": {
+        "answer_keywords": [],
+        "answer_keywords_mode": "any",
+        "min_answer_chars": 0,
+        "artifacts": [
+          {"suffix": ".docx", "min_bytes": 3000, "keywords": ["会议主要内容"], "keywords_mode": "all", "format": "gb9704"},
+          {"suffix": ".xlsx", "min_bytes": 2000, "keywords": ["责任人"], "keywords_mode": "all", "format": "xlsx_headers"}
+        ]
+      }
+    },
+    {
+      "id": "M08",
+      "difficulty": "medium",
+      "capability": "多步骤 / 按部门解析收件人 + 定向通知",
+      "instruction": "把 {fixture:meeting_short} 整理成纪要，并给技术科全体成员起草会议通知（只出草稿，不发送），产出保存到 {outdir}。",
+      "route": "pipeline",
+      "route_args": {"transcript": "{fixture:meeting_short}", "title": "技术科例会纪要", "recipients_group": "技术科"},
+      "requires": [],
+      "expected_tools": ["read_document", "write_minutes_docx", "write_todos_xlsx", "write_notice_txt"],
+      "grading": {
+        "answer_keywords": [],
+        "answer_keywords_mode": "any",
+        "min_answer_chars": 0,
+        "artifacts": [
+          {"suffix": ".txt", "min_bytes": 80, "keywords": ["技术科", "王强"], "keywords_mode": "all", "format": null}
+        ]
+      }
+    },
+    {
+      "id": "C01",
+      "difficulty": "complex",
+      "capability": "多 Agent 协作 / 语音转写 + 自动发送",
+      "instruction": "根据这份会议录音，生成纪要并提取待办，起草会议通知发给全部门。",
+      "route": "pipeline",
+      "route_args": {},
+      "requires": ["asr", "email_send", "gui"],
+      "expected_tools": ["transcribe_audio", "write_minutes_docx", "write_todos_xlsx", "write_notice_txt", "send_email"],
+      "grading": {
+        "answer_keywords": [],
+        "answer_keywords_mode": "any",
+        "min_answer_chars": 0,
+        "artifacts": []
+      }
+    },
+    {
+      "id": "C02",
+      "difficulty": "complex",
+      "capability": "多 Agent 协作 / RAG 检索 + 引用溯源",
+      "instruction": "根据这份政策文件，在知识库中找相关材料，写一份汇报提纲并标注引用出处。",
+      "route": "generic",
+      "route_args": {},
+      "requires": ["rag", "citation"],
+      "expected_tools": ["read_document", "search_knowledge_base", "write_file"],
+      "grading": {
+        "answer_keywords": ["引用", "出处"],
+        "answer_keywords_mode": "all",
+        "min_answer_chars": 200,
+        "artifacts": []
+      }
+    },
+    {
+      "id": "C03",
+      "difficulty": "complex",
+      "capability": "多 Agent 协作 / 端到端会议全链路（方案 8.1 原文示例）",
+      "instruction": "整理上周例会录音成纪要，提取待办，起草会议通知发邮件给全部门。",
+      "route": "pipeline",
+      "route_args": {},
+      "requires": ["asr", "email_send", "gui"],
+      "expected_tools": ["transcribe_audio", "write_minutes_docx", "write_todos_xlsx", "write_notice_txt", "send_email"],
+      "grading": {
+        "answer_keywords": [],
+        "answer_keywords_mode": "any",
+        "min_answer_chars": 0,
+        "artifacts": []
+      }
+    },
+    {
+      "id": "C04",
+      "difficulty": "complex",
+      "capability": "多 Agent 协作 / 数据分析 + 图表 + PPT 汇报",
+      "instruction": "查一下上个月的销售数据，做个汇总表并生成带图表的汇报 PPT。",
+      "route": "generic",
+      "route_args": {},
+      "requires": ["chart_gen", "pptx_gen"],
+      "expected_tools": ["read_document", "write_chart", "write_pptx"],
+      "grading": {
+        "answer_keywords": [],
+        "answer_keywords_mode": "any",
+        "min_answer_chars": 0,
+        "artifacts": []
+      }
+    },
+    {
+      "id": "C05",
+      "difficulty": "complex",
+      "capability": "多 Agent 协作 / 跨文档语义检索 + 去重",
+      "instruction": "在 data/inbox 全部文档中检索与「国产适配」相关的段落，去重后按时间排序输出并标注来源文件。",
+      "route": "generic",
+      "route_args": {},
+      "requires": ["rag", "vector_store"],
+      "expected_tools": ["search_knowledge_base", "write_file"],
+      "grading": {
+        "answer_keywords": ["来源", "适配"],
+        "answer_keywords_mode": "all",
+        "min_answer_chars": 150,
+        "artifacts": []
+      }
+    },
+    {
+      "id": "C06",
+      "difficulty": "complex",
+      "capability": "多 Agent 协作 / 桌面 GUI 实际操作",
+      "instruction": "用 WPS 打开 {fixture:policy_doc}，把标题改成「内部资料」，另存到 {outdir} 并关闭。",
+      "route": "generic",
+      "route_args": {},
+      "requires": ["gui", "wps_adapter"],
+      "expected_tools": ["gui_open_app", "gui_edit_document", "gui_save_as"],
+      "grading": {
+        "answer_keywords": [],
+        "answer_keywords_mode": "any",
+        "min_answer_chars": 0,
+        "artifacts": []
+      }
+    },
+    {
+      "id": "C07",
+      "difficulty": "complex",
+      "capability": "多 Agent 协作 / A2A 与端边云协同",
+      "instruction": "把这份长文档的分析任务分派给边侧模型协同完成，汇总各 Agent 结果后输出统一结论。",
+      "route": "generic",
+      "route_args": {},
+      "requires": ["a2a", "edge", "mcp_server"],
+      "expected_tools": ["a2a_dispatch", "edge_infer", "write_file"],
+      "grading": {
+        "answer_keywords": [],
+        "answer_keywords_mode": "any",
+        "min_answer_chars": 0,
+        "artifacts": []
+      }
+    }
+  ]
+}

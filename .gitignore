@@ -3,3 +3,5 @@ __pycache__/
 *.pyc
 tests/_tmp_out/
 data/outbox/demo_*/
+data/outbox/eval_*/
+data/workspace/eval.sqlite3

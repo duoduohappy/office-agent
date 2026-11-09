@@ -11,6 +11,7 @@
 .venv\Scripts\python.exe scripts\demo_offline.py      # 完整闭环演示，产出真实 Word/Excel 文件
 .venv\Scripts\python.exe tests\test_harness_offline.py  # 24 项
 .venv\Scripts\python.exe tests\test_pipeline_offline.py # 47 项
+.venv\Scripts\python.exe tests\test_eval_offline.py    # 61 项（只验证评测器逻辑，不产生指标实测值）
 ```
 
 演示用脚本化 LLM 模拟 Qwen2.5-7B 的 6 次调用（plan → map×2 → reduce → todos → email），
@@ -35,7 +36,8 @@
 | `agents/reflection.py` | 4.7 | ✅ 确定性规则优先（格式/逻辑/事实/安全敏感信息） |
 | `agents/orchestrator.py` | 2.2 | ✅ 完整会议闭环，含两次反思闸门 |
 | `memory/structured_db.py` | 4.6 | ✅ SQLite 审计日志、用户偏好、本地通讯录 |
-| `protocols/` `edge/` `eval/` `adapt/` | 3.1 / 8 / 7 | ⬜ 接口占位，下一阶段 |
+| `eval/` | 8 评测方案 | ✅ 20 条评测集、三层评分器、7 项指标采集、JSON/Markdown 报告；**真实指标仍 0/7 实测** |
+| `protocols/` `edge/` `adapt/` | 3.1 / 7 | ⬜ 接口占位，下一阶段 |
 
 **技术决策**：PDF 解析用纯 Python 的 `pypdf` 替代方案中的 PyMuPDF——
 国产 ARM 平台上 PyMuPDF 的预编译 wheel 经常缺失，纯 Python 实现部署成功率更高，
@@ -72,13 +74,48 @@ python main.py                      # 交互模式
 python main.py "列出 data/inbox 下的文件并总结内容"   # 通用任务（PlanAct + 工具循环）
 ```
 
+## 评测体系（方案第 8 章）
+
+| 文件 | 职责 |
+|---|---|
+| `eval/benchmark_tasks.json` | 20 条任务（简单 5 / 中等 8 / 复杂 7），含标准答案工具序列、评分规则、能力依赖标注 |
+| `eval/fixtures.py` | 可复现素材：docx / xlsx / 手写 PDF / txt / 长短会议转写稿 |
+| `eval/metrics.py` | LLM 与工具调用埋点、真 TTFT 探测、运行时 RSS 采样、LCS 工具准确率、7 项指标聚合 |
+| `eval/evaluator.py` | 执行器 + 三层评分器 + JSON/Markdown 报告 |
+| `eval/run_eval.py` | CLI 入口；`eval/results/` 存每轮结果 |
+
+```powershell
+.venv\Scripts\python.exe -m eval.run_eval --list     # 查看 20 条任务及能力缺口
+.venv\Scripts\python.exe -m eval.run_eval            # 真实模型全量评测（需 Ollama + 模型）
+.venv\Scripts\python.exe -m eval.run_eval --tasks S01,S02,M01
+.venv\Scripts\python.exe -m eval.run_eval --include-unsupported  # 复杂任务也实跑，看真实失败原因
+.venv\Scripts\python.exe tests\test_eval_offline.py  # 离线验证评测器逻辑
+```
+
+**评分口径**：确定性规则，不用 LLM-as-judge（端侧只有 7B，让模型自评既不可信也不可复现）。
+三层检查：最终回答关键字/长度 → 产出文件存在、体积、内容 → 文档格式
+（GB/T 9704 页边距/字号/中文字体/行距、Excel 表头）。
+工具准确率用 LCS 对齐后的 micro precision，recall 另列，防止少调工具刷分。
+
+**防自欺设计**：
+- 默认拒绝脚本化 LLM；离线自测须显式 `allow_mock`，报告顶部标注「不构成指标实测」
+- 首 Token 延迟单独发 `stream=True` 探测，逐块读到第一个非空 content 才停表。
+  产品链路用 `stream=False`，整段响应时间不是 TTFT，不能拿来充数
+- 内存峰值采 Ollama 服务进程 + Python 进程 RSS；未检测到 Ollama 进程就标 `unavailable`，
+  不把 20MB 的 Python 内存当成「0.02GB 达标」
+- 依赖未实现能力而跳过的任务**计入完成率分母**（算未完成），但不摊薄工具/格式/步数指标
+
+> **当前硬约束**：复杂 7 条全部依赖 RAG / 语音转写 / GUI / A2A 等未实现能力，
+> 即使另外 13 条全对，完成率上限也只有 **13/20 = 65%**，低于方案 8.2 的 70% 目标。
+> 在补齐至少 2 条复杂任务所需能力之前，模型调优无法让这项指标达标。
+
 ## 当前缺失项（如实记录）
 
 - Ollama / Qwen2.5-7B 模型未安装，真实模型链路尚未端到端验证
 - whisper.cpp 未安装：`transcribe_audio` 会明确报缺失，可用 `load_transcript` 走文本转写稿
 - Windows UIA / Linux AT-SPI 后端未安装，DesktopAgent 如实标记 `blocked`，不伪造发送成功
 - MCP 服务端、A2A 协议、Chroma 向量库与引用溯源、端边云协同、语音实际转写、GUI 实际操作均未实现
-- 所有离线测试使用脚本化 LLM，**方案 8.2 的 7 项指标全部尚未实测**；`eval/` 为空，20 条评测集与自动评分器未建
+- 评测体系（20 条任务集 + 三层评分器 + 指标采集器）已建，但 **方案 8.2 的 7 项指标仍 0/7 实测**：Ollama/模型未装，真实评测一轮没跑过
 - 真实模型下的工具调用准确率、Reflection 纠错效果、prompt 工程调优一轮都没做
 - 阶段 3 国产适配（HAL 抽象层、ARM 交叉编译、麒麟/UOS 与 WPS Linux 兼容性验证）未开始
 
@@ -86,12 +123,12 @@ python main.py "列出 data/inbox 下的文件并总结内容"   # 通用任务�
 
 评测集 20 条：简单 5 条（单工具 / 文档处理）+ 中等 8 条（多步骤 / 文档+数据）+ 复杂 7 条（多 Agent / RAG / 桌面操作）。
 
-| 指标 | 定义 | 目标 | 当前 |
-|---|---|---|---|
-| 任务完成率 | 最终产出符合用户要求的任务比例 | ≥70% | 未实测 |
-| 工具调用准确率 | 工具选择是否正确（对照标准答案） | ≥85% | 未实测 |
-| 格式正确率 | 生成文档是否符合模板格式规范 | ≥80% | 未实测 |
-| 平均完成步数 | 完成一个任务平均 Agent 循环步数 | ≤6 步 | 未实测 |
-| 平均耗时 | 端到端耗时（简单任务 ≤30 秒） | ≤3 分钟 | 未实测 |
-| 首 Token 延迟 | 模型第一次输出的等待时间 | <1.5 秒 | 未实测 |
-| 内存峰值 | 运行时最大内存占用 | <6GB | 未实测 |
+| 指标 | 定义 | 目标 | 当前 | 采数方式 |
+|---|---|---|---|---|
+| 任务完成率 | 最终产出符合用户要求的任务比例 | ≥70% | 未实测（上限 65%） | 20 条分母固定，三层评分全通过才算完成 |
+| 工具调用准确率 | 工具选择是否正确（对照标准答案） | ≥85% | 未实测 | 注册表埋点 + LCS 对齐 micro precision |
+| 格式正确率 | 生成文档是否符合模板格式规范 | ≥80% | 未实测 | python-docx / openpyxl 读回版式校验 |
+| 平均完成步数 | 完成一个任务平均 Agent 循环步数 | ≤6 步 | 未实测 | LLM 调用次数埋点 |
+| 平均耗时 | 端到端耗时（简单任务 ≤30 秒） | ≤3 分钟 | 未实测 | wall clock，简单任务单独统计 |
+| 首 Token 延迟 | 模型第一次输出的等待时间 | <1.5 秒 | 未实测 | `stream=True` 独立探测，3 次取中位数 |
+| 内存峰值 | 运行时最大内存占用 | <6GB | 未实测 | 1s 轮询 Ollama + Python 进程 RSS |
