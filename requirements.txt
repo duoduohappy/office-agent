@@ -1,0 +1,6 @@
+# 当前阶段核心零依赖（llm_client 只用标准库 urllib）
+# 文档工具在阶段 2 启用时取消注释
+# python-docx>=1.1
+# openpyxl>=3.1
+# python-pptx>=0.6
+# PyMuPDF>=1.24

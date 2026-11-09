@@ -1,0 +1,3 @@
+data/workspace/memory.sqlite3
+__pycache__/
+*.pyc
