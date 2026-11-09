@@ -6,7 +6,7 @@ import os
 from dataclasses import dataclass, field
 from pathlib import Path
 
-# D:/Projects/office-agent（core/ 的上一级）
+# 项目根目录 = core/ 的上一级（与部署盘符无关）
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
