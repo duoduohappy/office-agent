@@ -281,6 +281,15 @@ def test_runner_guards() -> None:
     check("工具调用序列被埋点采集", len(r0["tool_calls"]) >= 3, str(r0["tool_calls"]))
     check("循环步数被埋点采集", r0["llm_calls"] >= 3, str(r0["llm_calls"]))
     check("评测报告含完整七项指标", len(report["summary"]["metrics"]) == 7)
+    per_task_db = out / "M07" / "eval.sqlite3"
+    check("每条任务使用独立通讯录 DB", per_task_db.exists(), str(per_task_db))
+    if per_task_db.exists():
+        from memory.structured_db import StructuredMemory
+        mem = StructuredMemory(per_task_db)
+        emails = [c["email"] for c in mem.all_contacts()]
+        mem.close()
+        check("通讯录使用 RFC2606 保留域名", bool(emails) and all(e.endswith("@example.com") for e in emails),
+              str(emails))
 
 
 def test_report_no_absolute_paths() -> None:

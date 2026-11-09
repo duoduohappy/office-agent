@@ -8,8 +8,10 @@ tests/_tmp_out/
 __pycache__/
 *.pyc
 
-# 真实评测报告含本机环境信息，不入库；样例报告显式保留
+# 真实运行报告默认不入库（可能含本机环境信息）；两份脱敏样例/首轮实测显式保留
 eval/results/*.json
 eval/results/*.md
 !eval/results/sample_offline_report.json
 !eval/results/sample_offline_report.md
+!eval/results/first_real_eval_20261109.md
+!eval/results/first_real_eval_20261109.json

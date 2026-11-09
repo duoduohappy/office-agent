@@ -283,7 +283,10 @@ class EvalRunner:
         base_registry.extend(doc_tools.DOC_TOOLS)
         base_registry.extend(audio_tools.AUDIO_TOOLS)
         registry = RecordingRegistry(base_registry)
-        mem = StructuredMemory(PROJECT_ROOT / "data" / "workspace" / "eval.sqlite3")
+        # 每条任务用独立通讯录 DB：跨轮复用 data/workspace/eval.sqlite3 会让
+        # 评测结果依赖机器历史状态（旧库里曾残留过期域名/联系人，seed 因
+        # `all_contacts()` 非空被跳过），破坏可复现性。
+        mem = StructuredMemory(out_dir / "eval.sqlite3")
         self._seed_contacts(mem)
         self.llm.reset()
 
