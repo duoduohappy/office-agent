@@ -14,7 +14,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from core.llm_client import OllamaError
-from core.output_parser import OutputParseError, extract_json_array
+from core.output_parser import OutputParseError, extract_json, extract_json_array
 from core.tool_registry import ToolRegistry
 
 MAP_PROMPT = """你在整理一段会议录音转写稿的片段。请只保留有信息量的内容，输出该片段的要点摘要。
@@ -157,9 +157,16 @@ class MeetingAgent:
             resp = self.llm.chat(
                 [{"role": "user", "content": TODO_PROMPT.format(text=todo_input)}],
                 temperature=0.0,
-                format_json=True,
             )
-            raw_items = extract_json_array(resp.content)
+            # 不加 format_json：实测 qwen2.5:7b-instruct-q4_K_M 在 "format":"json"
+            # 约束下只会输出**单个对象**并漏掉后续待办，解析成数组失败后静默变 []。
+            # 放开约束 + 自研解析器（剥 fence / 括号平衡扫描）反而稳定拿到完整数组。
+            try:
+                raw_items = extract_json_array(resp.content)
+            except OutputParseError:
+                # 模型偶尔仍只给一个对象，包装成单元素数组，别把整批待办丢掉
+                single = extract_json(resp.content)
+                raw_items = [single] if single else []
             result.todos = [_normalize_todo(item) for item in raw_items if item]
         except (OllamaError, OutputParseError) as exc:
             # 待办提取失败不拖垮整条链路，纪要仍可交付
