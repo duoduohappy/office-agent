@@ -1,3 +1,15 @@
+> **文档性质与状态说明**
+>
+> 本文件是项目设计阶段技术方案的纯文本存档，用于对照实现，不是验收报告。
+> - 第 1.3 节、第 8.2 节的所有指标均为**设计目标值，不是实测结果**。
+> - 第 10.1 节「30 秒电梯陈述」是**预设话术草稿**，其中「完成率 70%、工具调用准确率 85%」
+>   同样属于目标值；在跑出真实评测数据前，不可作为已完成成绩引用。
+> - 文中提到的 MCP/A2A、Chroma 向量库、端边云协同、国产 CPU/OS 适配等能力，
+>   当前实现状态一律以仓库根目录 `README.md` 的「架构与实现状态」「当前缺失项」为准。
+> - 表格已按阅读顺序展开为逐行文本，去掉了 .docx 转换残留的 XML 标签。
+
+---
+
 端侧信创办公智能体技术方案
 —— 面向党政/金融/运营商政企客户的PC端Agent系统设计
 1 项目概述
@@ -12,44 +24,44 @@
 （3）信创适配：架构预留国产CPU（飞腾/鲲鹏）+国产OS（麒麟/统信）编译适配接口。
 （4）协议标准：原生支持MCP工具协议和A2A多智能体协作协议。
 1.3 目标与指标
-<w:tblPr><w:tblStyle w:val="TableGrid"/><w:tblW w:type="auto" w:w="0"/><w:jc w:val="center"/><w:tblLook w:firstColumn="1" w:firstRow="1" w:lastColumn="0" w:lastRow="0" w:noHBand="0" w:noVBand="1" w:val="04A0"/></w:tblPr><w:tblGrid><w:gridCol w:w="3024"/><w:gridCol w:w="3024"/><w:gridCol w:w="3024"/></w:tblGrid><w:tr><w:tc><w:tcPr><w:tcW w:type="dxa" w:w="2268"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>指标维度
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>目标值
-<w:tcPr><w:tcW w:type="dxa" w:w="5102"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>说明
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="2268"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>端到端任务完成率
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>≥70%
-<w:tcPr><w:tcW w:type="dxa" w:w="5102"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>20条典型办公任务评测集上的完成比例
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="2268"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>工具调用准确率
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>≥85%
-<w:tcPr><w:tcW w:type="dxa" w:w="5102"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>Agent正确选择并调用工具的比例
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="2268"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>首Token延迟
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>&lt;1.5秒
-<w:tcPr><w:tcW w:type="dxa" w:w="5102"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>Qwen2.5-7B Q4_K_M量化，端侧推理
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="2268"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>内存占用
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>&lt;6GB
-<w:tcPr><w:tcW w:type="dxa" w:w="5102"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>模型加载+Agent框架+向量库总内存
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="2268"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>支持文档格式
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>5类
-<w:tcPr><w:tcW w:type="dxa" w:w="5102"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>Word/Excel/PPT/PDF/TXT
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="2268"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>桌面应用操作
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>≥3个
-<w:tcPr><w:tcW w:type="dxa" w:w="5102"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>邮件客户端/文件管理器/浏览器
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="2268"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>多智能体协作
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>4个专职Agent
-<w:tcPr><w:tcW w:type="dxa" w:w="5102"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>Planner/Doc/Meeting/Desktop
+指标维度
+目标值
+说明
+端到端任务完成率
+≥70%
+20条典型办公任务评测集上的完成比例
+工具调用准确率
+≥85%
+Agent正确选择并调用工具的比例
+首Token延迟
+<1.5秒
+Qwen2.5-7B Q4_K_M量化，端侧推理
+内存占用
+<6GB
+模型加载+Agent框架+向量库总内存
+支持文档格式
+5类
+Word/Excel/PPT/PDF/TXT
+桌面应用操作
+≥3个
+邮件客户端/文件管理器/浏览器
+多智能体协作
+4个专职Agent
+Planner/Doc/Meeting/Desktop
 2 业务场景与闭环设计
 2.1 目标客户与场景
-<w:tblPr><w:tblStyle w:val="TableGrid"/><w:tblW w:type="auto" w:w="0"/><w:jc w:val="center"/><w:tblLook w:firstColumn="1" w:firstRow="1" w:lastColumn="0" w:lastRow="0" w:noHBand="0" w:noVBand="1" w:val="04A0"/></w:tblPr><w:tblGrid><w:gridCol w:w="3024"/><w:gridCol w:w="3024"/><w:gridCol w:w="3024"/></w:tblGrid><w:tr><w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1701"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>客户类型
-<w:tcPr><w:tcW w:type="dxa" w:w="3402"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>典型办公场景
-<w:tcPr><w:tcW w:type="dxa" w:w="3969"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>Agent能力需求
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>党政机关
-<w:tcPr><w:tcW w:type="dxa" w:w="3402"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>公文起草、会议纪要、政策文件检索、汇报材料生成
-<w:tcPr><w:tcW w:type="dxa" w:w="3969"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>文档RAG + 格式规范 + 保密合规
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>金融机构
-<w:tcPr><w:tcW w:type="dxa" w:w="3402"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>报告撰写、数据分析、客户邮件、合规审查
-<w:tcPr><w:tcW w:type="dxa" w:w="3969"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>数据处理 + 表格操作 + 风险检查
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>运营商
-<w:tcPr><w:tcW w:type="dxa" w:w="3402"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>工单处理、故障报告、运营数据分析、客服回复
-<w:tcPr><w:tcW w:type="dxa" w:w="3969"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>多系统操作 + 知识检索 + 自动填表
+客户类型
+典型办公场景
+Agent能力需求
+党政机关
+公文起草、会议纪要、政策文件检索、汇报材料生成
+文档RAG + 格式规范 + 保密合规
+金融机构
+报告撰写、数据分析、客户邮件、合规审查
+数据处理 + 表格操作 + 风险检查
+运营商
+工单处理、故障报告、运营数据分析、客服回复
+多系统操作 + 知识检索 + 自动填表
 2.2 业务闭环设计
 以"会议纪要整理+会议通知发送"这个典型办公任务为例，展示完整的Agent业务闭环：
 用户输入："帮我把上周部门例会录音整理成纪要，提取待办事项，起草一份会议通知发邮件给全体成员"┌──────────────────────────────────────────┐│  Planner Agent（规划分解）                ││  步骤1: 录音转写 → MeetingAgent          ││  步骤2: 摘要+待办提取 → MeetingAgent     ││  步骤3: 生成纪要文档 → DocAgent           ││  步骤4: 起草会议通知 → EmailAgent        ││  步骤5: 发送邮件 → DesktopAgent           │└──────────────────────────────────────────┘         ↓         ↓         ↓  MeetingAgent  DocAgent  EmailAgent  DesktopAgent  (录音转写+    (Word读写  (邮件草稿+   (打开邮件   摘要+待办)    格式编辑)   收件人查询)   客户端发送)         ↓         ↓         ↓  Memory Bank（本地向量库记录所有操作历史）         ↓  Reflection Agent（校验：格式对不对？待办漏了吗？收件人对吗？）         ↓  产出：会议纪要.docx + 待办清单.xlsx + 已发送邮件记录
@@ -61,63 +73,63 @@
 3 技术架构设计
 3.1 端边云协同架构
 整体采用"端-边-云"三级协同架构，对应JD中"端侧/端边云协同Agent的整体架构"要求：
-<w:tblPr><w:tblStyle w:val="TableGrid"/><w:tblW w:type="auto" w:w="0"/><w:jc w:val="center"/><w:tblLook w:firstColumn="1" w:firstRow="1" w:lastColumn="0" w:lastRow="0" w:noHBand="0" w:noVBand="1" w:val="04A0"/></w:tblPr><w:tblGrid><w:gridCol w:w="1814"/><w:gridCol w:w="1814"/><w:gridCol w:w="1814"/><w:gridCol w:w="1814"/><w:gridCol w:w="1814"/></w:tblGrid><w:tr><w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1134"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>层级
-<w:tcPr><w:tcW w:type="dxa" w:w="2268"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>部署位置
-<w:tcPr><w:tcW w:type="dxa" w:w="1984"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>模型规格
-<w:tcPr><w:tcW w:type="dxa" w:w="2268"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>承担任务
-<w:tcPr><w:tcW w:type="dxa" w:w="1984"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>数据流向
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1134"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>端侧
-<w:tcPr><w:tcW w:type="dxa" w:w="2268"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>用户PC（飞腾D3000M/普通x86）
-<w:tcPr><w:tcW w:type="dxa" w:w="1984"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>Qwen2.5-7B-Instruct Q4_K_M
-<w:tcPr><w:tcW w:type="dxa" w:w="2268"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>日常办公任务：文档处理、邮件、简单问答、工具调用
-<w:tcPr><w:tcW w:type="dxa" w:w="1984"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>本地闭环，数据不出机
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1134"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>边侧
-<w:tcPr><w:tcW w:type="dxa" w:w="2268"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>部门服务器（鲲鹏920/飞腾腾云）
-<w:tcPr><w:tcW w:type="dxa" w:w="1984"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>Qwen2.5-32B/72B INT4
-<w:tcPr><w:tcW w:type="dxa" w:w="2268"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>复杂推理：长文档分析、多步骤规划、批量任务
-<w:tcPr><w:tcW w:type="dxa" w:w="1984"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>端侧上传脱敏数据，结果回传端侧
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1134"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>云侧
-<w:tcPr><w:tcW w:type="dxa" w:w="2268"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>企业私有云
-<w:tcPr><w:tcW w:type="dxa" w:w="1984"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>72B+大模型 / 微调后的行业模型
-<w:tcPr><w:tcW w:type="dxa" w:w="2268"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>模型训练、SFT微调、评测、版本更新
-<w:tcPr><w:tcW w:type="dxa" w:w="1984"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>只下发模型权重，不上传业务数据
+层级
+部署位置
+模型规格
+承担任务
+数据流向
+端侧
+用户PC（飞腾D3000M/普通x86）
+Qwen2.5-7B-Instruct Q4_K_M
+日常办公任务：文档处理、邮件、简单问答、工具调用
+本地闭环，数据不出机
+边侧
+部门服务器（鲲鹏920/飞腾腾云）
+Qwen2.5-32B/72B INT4
+复杂推理：长文档分析、多步骤规划、批量任务
+端侧上传脱敏数据，结果回传端侧
+云侧
+企业私有云
+72B+大模型 / 微调后的行业模型
+模型训练、SFT微调、评测、版本更新
+只下发模型权重，不上传业务数据
 设计要点：端侧是主战场，90%的日常办公任务在端侧闭环完成；边侧处理端侧搞不定的复杂任务；云侧只做模型训练和下发，不碰业务数据。这个分层直接回应了信创客户"数据不出内网"的核心诉求。
 3.2 Agent Harness设计
 Harness是Agent的"运行时"，负责模型调用、工具注册、状态管理、循环控制。核心循环如下：
 Agent Harness 主循环：1. 接收用户指令（自然语言）2. 构造System Prompt（角色定义 + 工具说明 + 记忆摘要）3. 调用本地LLM（Ollama API）4. 解析模型输出：   - 如果是工具调用请求 → 执行工具 → 结果回灌 → 回到步骤3   - 如果是最终回答 → 进入步骤55. Reflection Agent校验输出质量   - 校验通过 → 返回用户 + 写入Memory Bank   - 校验不通过 → 生成纠错指令 → 回到步骤36. 任务结束，记录到审计日志
 3.3 核心技术范式选型
-<w:tblPr><w:tblStyle w:val="TableGrid"/><w:tblW w:type="auto" w:w="0"/><w:jc w:val="center"/><w:tblLook w:firstColumn="1" w:firstRow="1" w:lastColumn="0" w:lastRow="0" w:noHBand="0" w:noVBand="1" w:val="04A0"/></w:tblPr><w:tblGrid><w:gridCol w:w="2268"/><w:gridCol w:w="2268"/><w:gridCol w:w="2268"/><w:gridCol w:w="2268"/></w:tblGrid><w:tr><w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1701"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>技术点
-<w:tcPr><w:tcW w:type="dxa" w:w="1984"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>选型
-<w:tcPr><w:tcW w:type="dxa" w:w="3118"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>为什么选它
-<w:tcPr><w:tcW w:type="dxa" w:w="2268"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>对应JD要求
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>任务规划范式
-<w:tcPr><w:tcW w:type="dxa" w:w="1984"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>PlanAct + 动态重规划
-<w:tcPr><w:tcW w:type="dxa" w:w="3118"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>先出计划再执行，执行中可调整，比纯ReAct更可控
-<w:tcPr><w:tcW w:type="dxa" w:w="2268"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>复杂规划、任务规划
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>工具调用范式
-<w:tcPr><w:tcW w:type="dxa" w:w="1984"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>ReAct + MCP协议
-<w:tcPr><w:tcW w:type="dxa" w:w="3118"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>MCP是行业标准，工具可插拔、可复用
-<w:tcPr><w:tcW w:type="dxa" w:w="2268"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>工具调用、MCP协议
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>多智能体协作
-<w:tcPr><w:tcW w:type="dxa" w:w="1984"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>A2A协议
-<w:tcPr><w:tcW w:type="dxa" w:w="3118"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>Google主导的开放协议，不同框架的Agent可互操作
-<w:tcPr><w:tcW w:type="dxa" w:w="2268"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>多智能体协作、A2A协议
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>记忆系统
-<w:tcPr><w:tcW w:type="dxa" w:w="1984"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>向量库 + 结构化记忆双层
-<w:tcPr><w:tcW w:type="dxa" w:w="3118"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>向量库存语义记忆，SQLite存结构化偏好和事实
-<w:tcPr><w:tcW w:type="dxa" w:w="2268"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>记忆
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>反思机制
-<w:tcPr><w:tcW w:type="dxa" w:w="1984"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>输出校验 + 自我纠错循环
-<w:tcPr><w:tcW w:type="dxa" w:w="3118"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>在关键节点引入第二个Agent做质量检查
-<w:tcPr><w:tcW w:type="dxa" w:w="2268"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>反思机制
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>RAG方案
-<w:tcPr><w:tcW w:type="dxa" w:w="1984"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>本地Embedding + 向量检索 + 引用溯源
-<w:tcPr><w:tcW w:type="dxa" w:w="3118"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>政务文档必须能追溯来源，不能黑盒
-<w:tcPr><w:tcW w:type="dxa" w:w="2268"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>RAG深度优化
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>端侧推理
-<w:tcPr><w:tcW w:type="dxa" w:w="1984"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>Ollama + llama.cpp + GGUF量化
-<w:tcPr><w:tcW w:type="dxa" w:w="3118"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>生态最成熟，支持跨平台编译，国产CPU可适配
-<w:tcPr><w:tcW w:type="dxa" w:w="2268"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>端侧推理优化
+技术点
+选型
+为什么选它
+对应JD要求
+任务规划范式
+PlanAct + 动态重规划
+先出计划再执行，执行中可调整，比纯ReAct更可控
+复杂规划、任务规划
+工具调用范式
+ReAct + MCP协议
+MCP是行业标准，工具可插拔、可复用
+工具调用、MCP协议
+多智能体协作
+A2A协议
+Google主导的开放协议，不同框架的Agent可互操作
+多智能体协作、A2A协议
+记忆系统
+向量库 + 结构化记忆双层
+向量库存语义记忆，SQLite存结构化偏好和事实
+记忆
+反思机制
+输出校验 + 自我纠错循环
+在关键节点引入第二个Agent做质量检查
+反思机制
+RAG方案
+本地Embedding + 向量检索 + 引用溯源
+政务文档必须能追溯来源，不能黑盒
+RAG深度优化
+端侧推理
+Ollama + llama.cpp + GGUF量化
+生态最成熟，支持跨平台编译，国产CPU可适配
+端侧推理优化
 4 核心模块详细设计
 4.1 Planner Agent（规划调度器）
 职责：接收用户原始指令，拆解为子任务序列，调度下游专职Agent执行。
@@ -169,92 +181,92 @@ Agent Harness 主循环：1. 接收用户指令（自然语言）2. 构造System
 （3）安全校验：有没有敏感信息泄露？有没有越权操作？
 （4）纠错机制：校验不通过时，自动生成纠错指令，让对应Agent重新生成。
 5 技术栈选型
-<w:tblPr><w:tblStyle w:val="TableGrid"/><w:tblW w:type="auto" w:w="0"/><w:jc w:val="center"/><w:tblLook w:firstColumn="1" w:firstRow="1" w:lastColumn="0" w:lastRow="0" w:noHBand="0" w:noVBand="1" w:val="04A0"/></w:tblPr><w:tblGrid><w:gridCol w:w="2268"/><w:gridCol w:w="2268"/><w:gridCol w:w="2268"/><w:gridCol w:w="2268"/></w:tblGrid><w:tr><w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1417"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>层级
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>组件
-<w:tcPr><w:tcW w:type="dxa" w:w="2835"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>选型
-<w:tcPr><w:tcW w:type="dxa" w:w="3118"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>说明
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1417"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>模型层
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>端侧LLM
-<w:tcPr><w:tcW w:type="dxa" w:w="2835"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>Qwen2.5-7B-Instruct GGUF Q4_K_M
-<w:tcPr><w:tcW w:type="dxa" w:w="3118"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>8GB内存可跑，中文能力强
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1417"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>模型层
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>语音转写
-<w:tcPr><w:tcW w:type="dxa" w:w="2835"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>Whisper.cpp base/tiny
-<w:tcPr><w:tcW w:type="dxa" w:w="3118"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>CPU推理，本地运行
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1417"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>模型层
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>Embedding
-<w:tcPr><w:tcW w:type="dxa" w:w="2835"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>bge-small-zh-v1.5 GGUF
-<w:tcPr><w:tcW w:type="dxa" w:w="3118"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>中文embedding，本地量化运行
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1417"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>推理引擎
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>端侧推理
-<w:tcPr><w:tcW w:type="dxa" w:w="2835"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>Ollama + llama.cpp
-<w:tcPr><w:tcW w:type="dxa" w:w="3118"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>跨平台，支持ARM编译
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1417"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>Agent框架
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>Harness
-<w:tcPr><w:tcW w:type="dxa" w:w="2835"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>自研轻量框架（~2000行Python）
-<w:tcPr><w:tcW w:type="dxa" w:w="3118"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>不依赖重型框架，可控可解释
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1417"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>协议层
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>工具协议
-<w:tcPr><w:tcW w:type="dxa" w:w="2835"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>MCP (Model Context Protocol)
-<w:tcPr><w:tcW w:type="dxa" w:w="3118"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>工具标准化，可插拔
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1417"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>协议层
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>多智能体协议
-<w:tcPr><w:tcW w:type="dxa" w:w="2835"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>A2A (Agent-to-Agent)
-<w:tcPr><w:tcW w:type="dxa" w:w="3118"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>Google主导，开放互操作
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1417"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>记忆层
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>向量数据库
-<w:tcPr><w:tcW w:type="dxa" w:w="2835"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>Chroma (本地嵌入式)
-<w:tcPr><w:tcW w:type="dxa" w:w="3118"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>轻量，无需独立服务
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1417"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>记忆层
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>结构化存储
-<w:tcPr><w:tcW w:type="dxa" w:w="2835"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>SQLite
-<w:tcPr><w:tcW w:type="dxa" w:w="3118"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>单文件，易备份，适合端侧
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1417"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>文档处理
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>Office套件
-<w:tcPr><w:tcW w:type="dxa" w:w="2835"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>python-docx / openpyxl / python-pptx / PyMuPDF
-<w:tcPr><w:tcW w:type="dxa" w:w="3118"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>成熟稳定
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1417"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>桌面操作
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>GUI自动化
-<w:tcPr><w:tcW w:type="dxa" w:w="2835"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>pywinauto (Win) / pyatspi (Linux)
-<w:tcPr><w:tcW w:type="dxa" w:w="3118"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>读UI树，不靠截图
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1417"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>端边通信
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>边侧调用
-<w:tcPr><w:tcW w:type="dxa" w:w="2835"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>gRPC + 本地HTTP代理
-<w:tcPr><w:tcW w:type="dxa" w:w="3118"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>端侧调边侧时加密传输
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1417"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>开发语言
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>主语言
-<w:tcPr><w:tcW w:type="dxa" w:w="2835"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>Python 3.10+
-<w:tcPr><w:tcW w:type="dxa" w:w="3118"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>生态最全，AI库支持最好
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1417"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>开发语言
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>性能关键路径
-<w:tcPr><w:tcW w:type="dxa" w:w="2835"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>C++ (llama.cpp编译层)
-<w:tcPr><w:tcW w:type="dxa" w:w="3118"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>端侧推理性能优化
+层级
+组件
+选型
+说明
+模型层
+端侧LLM
+Qwen2.5-7B-Instruct GGUF Q4_K_M
+8GB内存可跑，中文能力强
+模型层
+语音转写
+Whisper.cpp base/tiny
+CPU推理，本地运行
+模型层
+Embedding
+bge-small-zh-v1.5 GGUF
+中文embedding，本地量化运行
+推理引擎
+端侧推理
+Ollama + llama.cpp
+跨平台，支持ARM编译
+Agent框架
+Harness
+自研轻量框架（~2000行Python）
+不依赖重型框架，可控可解释
+协议层
+工具协议
+MCP (Model Context Protocol)
+工具标准化，可插拔
+协议层
+多智能体协议
+A2A (Agent-to-Agent)
+Google主导，开放互操作
+记忆层
+向量数据库
+Chroma (本地嵌入式)
+轻量，无需独立服务
+记忆层
+结构化存储
+SQLite
+单文件，易备份，适合端侧
+文档处理
+Office套件
+python-docx / openpyxl / python-pptx / PyMuPDF
+成熟稳定
+桌面操作
+GUI自动化
+pywinauto (Win) / pyatspi (Linux)
+读UI树，不靠截图
+端边通信
+边侧调用
+gRPC + 本地HTTP代理
+端侧调边侧时加密传输
+开发语言
+主语言
+Python 3.10+
+生态最全，AI库支持最好
+开发语言
+性能关键路径
+C++ (llama.cpp编译层)
+端侧推理性能优化
 6 项目目录结构
 office-agent/├── README.md                 # 项目说明 + 快速启动├── requirements.txt├── config/│   ├── settings.yaml         # 全局配置（模型路径、端口、白名单）│   └── office_templates/     # 政务公文模板│       ├── meeting_minutes.docx│       ├── notice.docx│       └── report.docx├── core/                     # Agent Harness核心│   ├── harness.py             # 主循环：prompt构造→模型调用→输出解析│   ├── llm_client.py         # Ollama API封装│   ├── tool_registry.py      # 工具注册与发现（MCP）│   ├── prompt_builder.py     # System Prompt模板管理│   └── output_parser.py      # 结构化输出解析（JSON/工具调用）├── agents/                   # 专职Agent│   ├── planner.py            # 规划调度器│   ├── meeting_agent.py      # 会议处理│   ├── doc_agent.py          # 文档处理│   ├── email_agent.py        # 邮件处理│   ├── desktop_agent.py      # 桌面操作│   └── reflection.py         # 反思校验├── tools/                    # MCP工具集│   ├── file_tools.py         # 文件读写│   ├── doc_tools.py          # Word/Excel/PPT/PDF操作│   ├── audio_tools.py        # 录音转写（Whisper）│   ├── email_tools.py        # SMTP发送 / 邮件客户端操作│   └── desktop_tools.py      # GUI自动化（UI树读取+操作）├── memory/                   # 记忆系统│   ├── vector_store.py       # Chroma向量库封装│   ├── structured_db.py      # SQLite结构化记忆│   └── memory_manager.py     # 写入/召回/去重/衰减策略├── protocols/                # 协议实现│   ├── mcp_server.py         # MCP服务端│   └── a2a_client.py         # A2A多智能体通信├── edge/                     # 端边协同│   └── edge_client.py        # 边侧模型调用客户端├── eval/                     # 评测体系│   ├── benchmark_tasks.json  # 20条评测任务集│   ├── evaluator.py           # 自动评分脚本│   └── results/              # 评测结果记录├── adapt/                    # 国产适配层│   ├── hardware_abstraction.py # 硬件抽象层│   ├── phytium_arm/          # 飞腾ARM编译适配│   └── kylin_linux/         # 麒麟OS适配└── main.py                   # 入口：CLI交互 / 桌面GUI
 7 国产软硬件适配方案
 7.1 适配目标
 架构设计上预留完整的国产软硬件适配能力，这是本项目区别于普通PC Agent的核心竞争力，也是直接对应JD中"国产软硬件适配"要求的关键章节。
 7.2 硬件适配路线
-<w:tblPr><w:tblStyle w:val="TableGrid"/><w:tblW w:type="auto" w:w="0"/><w:jc w:val="center"/><w:tblLook w:firstColumn="1" w:firstRow="1" w:lastColumn="0" w:lastRow="0" w:noHBand="0" w:noVBand="1" w:val="04A0"/></w:tblPr><w:tblGrid><w:gridCol w:w="2268"/><w:gridCol w:w="2268"/><w:gridCol w:w="2268"/><w:gridCol w:w="2268"/></w:tblGrid><w:tr><w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1984"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>平台
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>CPU架构
-<w:tcPr><w:tcW w:type="dxa" w:w="3685"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>适配要点
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>优先级
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1984"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>飞腾腾锐D3000M
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>ARMv8 (FTC862内核)
-<w:tcPr><w:tcW w:type="dxa" w:w="3685"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>llama.cpp ARM交叉编译；Ollama ARM版适配；内存带宽优化
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>P0（联想开天主力机型）
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1984"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>飞腾腾云S5000C
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>ARMv8 (服务器)
-<w:tcPr><w:tcW w:type="dxa" w:w="3685"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>边侧推理部署；多模型并发；gRPC服务化
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>P1
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1984"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>鲲鹏920
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>ARMv8 (TaiShan)
-<w:tcPr><w:tcW w:type="dxa" w:w="3685"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>同飞腾路线，验证兼容性
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>P1
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1984"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>x86_64 (Intel/AMD)
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>x86
-<w:tcPr><w:tcW w:type="dxa" w:w="3685"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>开发调试环境，基线版本
-<w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>P0（开发用）
+平台
+CPU架构
+适配要点
+优先级
+飞腾腾锐D3000M
+ARMv8 (FTC862内核)
+llama.cpp ARM交叉编译；Ollama ARM版适配；内存带宽优化
+P0（联想开天主力机型）
+飞腾腾云S5000C
+ARMv8 (服务器)
+边侧推理部署；多模型并发；gRPC服务化
+P1
+鲲鹏920
+ARMv8 (TaiShan)
+同飞腾路线，验证兼容性
+P1
+x86_64 (Intel/AMD)
+x86
+开发调试环境，基线版本
+P0（开发用）
 7.3 操作系统适配
 （1）银河麒麟桌面版V10：Linux内核，桌面环境UKUI，用AT-SPI做GUI自动化。
 （2）统信UOS V20：Linux内核，桌面环境DDE，同样走AT-SPI路线。
@@ -268,113 +280,113 @@ office-agent/├── README.md                 # 项目说明 + 快速启动�
 8 评测方案
 8.1 评测任务集设计
 构造20条典型政企办公任务，覆盖不同复杂度：
-<w:tblPr><w:tblStyle w:val="TableGrid"/><w:tblW w:type="auto" w:w="0"/><w:jc w:val="center"/><w:tblLook w:firstColumn="1" w:firstRow="1" w:lastColumn="0" w:lastRow="0" w:noHBand="0" w:noVBand="1" w:val="04A0"/></w:tblPr><w:tblGrid><w:gridCol w:w="3024"/><w:gridCol w:w="3024"/><w:gridCol w:w="3024"/></w:tblGrid><w:tr><w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1417"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>难度
-<w:tcPr><w:tcW w:type="dxa" w:w="4535"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>任务示例
-<w:tcPr><w:tcW w:type="dxa" w:w="3118"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>考察能力
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1417"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>简单（5条）
-<w:tcPr><w:tcW w:type="dxa" w:w="4535"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>"把这个PDF文件转成Word格式"、"总结这份文档的要点"
-<w:tcPr><w:tcW w:type="dxa" w:w="3118"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>单工具调用、文档处理
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1417"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>中等（8条）
-<w:tcPr><w:tcW w:type="dxa" w:w="4535"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>"根据这份会议录音，生成纪要并提取待办"、"查一下上个月的销售数据，做个汇总表"
-<w:tcPr><w:tcW w:type="dxa" w:w="3118"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>多步骤、文档+数据处理
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1417"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>复杂（7条）
-<w:tcPr><w:tcW w:type="dxa" w:w="4535"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>"整理上周例会录音成纪要，提取待办，起草会议通知发邮件给全部门"、"根据这份政策文件，在知识库中找相关材料，写一份汇报提纲"
-<w:tcPr><w:tcW w:type="dxa" w:w="3118"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>多Agent协作、RAG、桌面操作
+难度
+任务示例
+考察能力
+简单（5条）
+"把这个PDF文件转成Word格式"、"总结这份文档的要点"
+单工具调用、文档处理
+中等（8条）
+"根据这份会议录音，生成纪要并提取待办"、"查一下上个月的销售数据，做个汇总表"
+多步骤、文档+数据处理
+复杂（7条）
+"整理上周例会录音成纪要，提取待办，起草会议通知发邮件给全部门"、"根据这份政策文件，在知识库中找相关材料，写一份汇报提纲"
+多Agent协作、RAG、桌面操作
 8.2 评测指标
-<w:tblPr><w:tblStyle w:val="TableGrid"/><w:tblW w:type="auto" w:w="0"/><w:jc w:val="center"/><w:tblLook w:firstColumn="1" w:firstRow="1" w:lastColumn="0" w:lastRow="0" w:noHBand="0" w:noVBand="1" w:val="04A0"/></w:tblPr><w:tblGrid><w:gridCol w:w="3024"/><w:gridCol w:w="3024"/><w:gridCol w:w="3024"/></w:tblGrid><w:tr><w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1701"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>指标
-<w:tcPr><w:tcW w:type="dxa" w:w="4819"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>定义
-<w:tcPr><w:tcW w:type="dxa" w:w="2551"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>目标值
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>任务完成率
-<w:tcPr><w:tcW w:type="dxa" w:w="4819"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>最终产出符合用户要求的任务比例
-<w:tcPr><w:tcW w:type="dxa" w:w="2551"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>≥70%
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>工具调用准确率
-<w:tcPr><w:tcW w:type="dxa" w:w="4819"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>Agent选择的工具是否正确（对照标准答案）
-<w:tcPr><w:tcW w:type="dxa" w:w="2551"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>≥85%
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>格式正确率
-<w:tcPr><w:tcW w:type="dxa" w:w="4819"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>生成的文档是否符合模板格式规范
-<w:tcPr><w:tcW w:type="dxa" w:w="2551"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>≥80%
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>平均完成步数
-<w:tcPr><w:tcW w:type="dxa" w:w="4819"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>完成一个任务平均需要多少步Agent循环
-<w:tcPr><w:tcW w:type="dxa" w:w="2551"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>≤6步
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>平均耗时
-<w:tcPr><w:tcW w:type="dxa" w:w="4819"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>端到端完成任务的平均时间
-<w:tcPr><w:tcW w:type="dxa" w:w="2551"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>≤3分钟（简单任务≤30秒）
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>首Token延迟
-<w:tcPr><w:tcW w:type="dxa" w:w="4819"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>模型第一次输出的等待时间
-<w:tcPr><w:tcW w:type="dxa" w:w="2551"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>&lt;1.5秒
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1701"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>内存峰值
-<w:tcPr><w:tcW w:type="dxa" w:w="4819"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>运行时最大内存占用
-<w:tcPr><w:tcW w:type="dxa" w:w="2551"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>&lt;6GB
+指标
+定义
+目标值
+任务完成率
+最终产出符合用户要求的任务比例
+≥70%
+工具调用准确率
+Agent选择的工具是否正确（对照标准答案）
+≥85%
+格式正确率
+生成的文档是否符合模板格式规范
+≥80%
+平均完成步数
+完成一个任务平均需要多少步Agent循环
+≤6步
+平均耗时
+端到端完成任务的平均时间
+≤3分钟（简单任务≤30秒）
+首Token延迟
+模型第一次输出的等待时间
+<1.5秒
+内存峰值
+运行时最大内存占用
+<6GB
 9 参考开源项目
 9.1 PC端Agent标杆
-<w:tblPr><w:tblStyle w:val="TableGrid"/><w:tblW w:type="auto" w:w="0"/><w:jc w:val="center"/><w:tblLook w:firstColumn="1" w:firstRow="1" w:lastColumn="0" w:lastRow="0" w:noHBand="0" w:noVBand="1" w:val="04A0"/></w:tblPr><w:tblGrid><w:gridCol w:w="2268"/><w:gridCol w:w="2268"/><w:gridCol w:w="2268"/><w:gridCol w:w="2268"/></w:tblGrid><w:tr><w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1984"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>项目
-<w:tcPr><w:tcW w:type="dxa" w:w="1417"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>Stars级别
-<w:tcPr><w:tcW w:type="dxa" w:w="3402"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>参考价值
-<w:tcPr><w:tcW w:type="dxa" w:w="2268"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>GitHub地址
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1984"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>OpenClaw
-<w:tcPr><w:tcW w:type="dxa" w:w="1417"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>~247K
-<w:tcPr><w:tcW w:type="dxa" w:w="3402"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>PC端操作Agent的标杆，技能市场、多通道接入、Ollama本地支持
-<w:tcPr><w:tcW w:type="dxa" w:w="2268"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>github.com/openclaw/openclaw
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1984"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>Vercel agent-desktop
-<w:tcPr><w:tcW w:type="dxa" w:w="1417"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>较新
-<w:tcPr><w:tcW w:type="dxa" w:w="3402"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>不靠截图读OS UI树，token省96%——这个技术点面试加分
-<w:tcPr><w:tcW w:type="dxa" w:w="2268"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>github.com/vercel-labs/agent-desktop
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1984"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>Open Interpreter
-<w:tcPr><w:tcW w:type="dxa" w:w="1417"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>~56K
-<w:tcPr><w:tcW w:type="dxa" w:w="3402"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>代码执行Agent鼻祖，本地Python/Shell执行
-<w:tcPr><w:tcW w:type="dxa" w:w="2268"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>github.com/OpenInterpreter/open-interpreter
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1984"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>Jan.ai
-<w:tcPr><w:tcW w:type="dxa" w:w="1417"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>~28K
-<w:tcPr><w:tcW w:type="dxa" w:w="3402"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>桌面AI助手Electron+GGUF，UI参考
-<w:tcPr><w:tcW w:type="dxa" w:w="2268"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>github.com/menloresearch/jan
+项目
+Stars级别
+参考价值
+GitHub地址
+OpenClaw
+~247K
+PC端操作Agent的标杆，技能市场、多通道接入、Ollama本地支持
+github.com/openclaw/openclaw
+Vercel agent-desktop
+较新
+不靠截图读OS UI树，token省96%——这个技术点面试加分
+github.com/vercel-labs/agent-desktop
+Open Interpreter
+~56K
+代码执行Agent鼻祖，本地Python/Shell执行
+github.com/OpenInterpreter/open-interpreter
+Jan.ai
+~28K
+桌面AI助手Electron+GGUF，UI参考
+github.com/menloresearch/jan
 9.2 本地RAG与文档处理
-<w:tblPr><w:tblStyle w:val="TableGrid"/><w:tblW w:type="auto" w:w="0"/><w:jc w:val="center"/><w:tblLook w:firstColumn="1" w:firstRow="1" w:lastColumn="0" w:lastRow="0" w:noHBand="0" w:noVBand="1" w:val="04A0"/></w:tblPr><w:tblGrid><w:gridCol w:w="3024"/><w:gridCol w:w="3024"/><w:gridCol w:w="3024"/></w:tblGrid><w:tr><w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1984"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>项目
-<w:tcPr><w:tcW w:type="dxa" w:w="1417"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>Stars级别
-<w:tcPr><w:tcW w:type="dxa" w:w="5669"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>参考价值
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1984"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>AnythingLLM
-<w:tcPr><w:tcW w:type="dxa" w:w="1417"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>~67K
-<w:tcPr><w:tcW w:type="dxa" w:w="5669"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>本地文档对话+RAG，桌面端应用，直接改造为政务知识库模块
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1984"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>CowAgent
-<w:tcPr><w:tcW w:type="dxa" w:w="1417"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>Gitee热门
-<w:tcPr><w:tcW w:type="dxa" w:w="5669"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>原chatgpt-on-wechat，Agent Harness工程实践，多通道接入
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="1984"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>LobeHub
-<w:tcPr><w:tcW w:type="dxa" w:w="1417"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>大星
-<w:tcPr><w:tcW w:type="dxa" w:w="5669"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>AI协作平台，多Agent编排界面参考
+项目
+Stars级别
+参考价值
+AnythingLLM
+~67K
+本地文档对话+RAG，桌面端应用，直接改造为政务知识库模块
+CowAgent
+Gitee热门
+原chatgpt-on-wechat，Agent Harness工程实践，多通道接入
+LobeHub
+大星
+AI协作平台，多Agent编排界面参考
 9.3 协议与多智能体框架
-<w:tblPr><w:tblStyle w:val="TableGrid"/><w:tblW w:type="auto" w:w="0"/><w:jc w:val="center"/><w:tblLook w:firstColumn="1" w:firstRow="1" w:lastColumn="0" w:lastRow="0" w:noHBand="0" w:noVBand="1" w:val="04A0"/></w:tblPr><w:tblGrid><w:gridCol w:w="4536"/><w:gridCol w:w="4536"/></w:tblGrid><w:tr><w:tc><w:tcPr><w:tcW w:type="dxa" w:w="2835"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>项目
-<w:tcPr><w:tcW w:type="dxa" w:w="6236"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>说明
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="2835"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>a2aproject/A2A
-<w:tcPr><w:tcW w:type="dxa" w:w="6236"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>Google官方A2A协议，~26K stars，多智能体互操作标准
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="2835"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>python-a2a (PyPI)
-<w:tcPr><w:tcW w:type="dxa" w:w="6236"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>Python的A2A协议实现库，直接pip install用
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="2835"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>AG2 (原AutoGen)
-<w:tcPr><w:tcW w:type="dxa" w:w="6236"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>微软多智能体框架，快速搭建多Agent协作原型
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="2835"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>OpenAgents
-<w:tcPr><w:tcW w:type="dxa" w:w="6236"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>原生支持MCP+A2A的多智能体框架
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="2835"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>modelcontextprotocol
-<w:tcPr><w:tcW w:type="dxa" w:w="6236"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>Anthropic主导的MCP协议规范和SDK
+项目
+说明
+a2aproject/A2A
+Google官方A2A协议，~26K stars，多智能体互操作标准
+python-a2a (PyPI)
+Python的A2A协议实现库，直接pip install用
+AG2 (原AutoGen)
+微软多智能体框架，快速搭建多Agent协作原型
+OpenAgents
+原生支持MCP+A2A的多智能体框架
+modelcontextprotocol
+Anthropic主导的MCP协议规范和SDK
 10 面试话术与亮点提炼
 10.1 30秒电梯陈述
 "我做了一个完全跑在PC端的政企办公Agent。背景是信创客户的数据不能出内网，云端大模型用不了，但办公效率又需要AI提升。我的方案是端侧跑7B量化模型，多智能体协作完成文档处理、会议纪要、邮件发送这些闭环任务，同时架构上预留了飞腾CPU+麒麟OS的适配能力。20条办公任务评测集上端到端完成率70%，工具调用准确率85%。"
 10.2 技术难点与解决方案（面试重点讲）
-<w:tblPr><w:tblStyle w:val="TableGrid"/><w:tblW w:type="auto" w:w="0"/><w:jc w:val="center"/><w:tblLook w:firstColumn="1" w:firstRow="1" w:lastColumn="0" w:lastRow="0" w:noHBand="0" w:noVBand="1" w:val="04A0"/></w:tblPr><w:tblGrid><w:gridCol w:w="3024"/><w:gridCol w:w="3024"/><w:gridCol w:w="3024"/></w:tblGrid><w:tr><w:tc><w:tcPr><w:tcW w:type="dxa" w:w="2268"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>难点
-<w:tcPr><w:tcW w:type="dxa" w:w="3969"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>你的解法
-<w:tcPr><w:tcW w:type="dxa" w:w="2835"/><w:shd w:fill="D9D9D9"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:b/><w:sz w:val="21"/></w:rPr><w:t>体现能力
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="2268"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>端侧7B模型工具调用容易跑偏
-<w:tcPr><w:tcW w:type="dxa" w:w="3969"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>结构化输出约束（JSON Schema）+ Reflection校验层，把准确率从60%拉到85%
-<w:tcPr><w:tcW w:type="dxa" w:w="2835"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>Harness设计、Prompt工程
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="2268"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>端侧资源受限，内存吃紧
-<w:tcPr><w:tcW w:type="dxa" w:w="3969"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>GGUF Q4量化 + Chroma嵌入式向量库 + SQLite，总内存控制在6GB以内
-<w:tcPr><w:tcW w:type="dxa" w:w="2835"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>端侧推理优化
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="2268"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>桌面操作靠截图太慢太耗token
-<w:tcPr><w:tcW w:type="dxa" w:w="3969"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>参考agent-desktop思路，直接读OS UI控件树，不靠视觉模型
-<w:tcPr><w:tcW w:type="dxa" w:w="2835"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>技术选型、前沿追踪
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="2268"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>国产CPU适配怎么落地
-<w:tcPr><w:tcW w:type="dxa" w:w="3969"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>硬件抽象层 + llama.cpp ARM交叉编译，x86开发ARM运行
-<w:tcPr><w:tcW w:type="dxa" w:w="2835"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>国产软硬件适配
-<w:tc><w:tcPr><w:tcW w:type="dxa" w:w="2268"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="center"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>多Agent协作怎么不混乱
-<w:tcPr><w:tcW w:type="dxa" w:w="3969"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>Planner集中调度 + A2A协议标准化通信，职责边界清晰
-<w:tcPr><w:tcW w:type="dxa" w:w="2835"/></w:tcPr><w:p><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/></w:pPr><w:r/><w:r><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="宋体"/><w:sz w:val="21"/></w:rPr><w:t>多智能体架构
+难点
+你的解法
+体现能力
+端侧7B模型工具调用容易跑偏
+结构化输出约束（JSON Schema）+ Reflection校验层，把准确率从60%拉到85%
+Harness设计、Prompt工程
+端侧资源受限，内存吃紧
+GGUF Q4量化 + Chroma嵌入式向量库 + SQLite，总内存控制在6GB以内
+端侧推理优化
+桌面操作靠截图太慢太耗token
+参考agent-desktop思路，直接读OS UI控件树，不靠视觉模型
+技术选型、前沿追踪
+国产CPU适配怎么落地
+硬件抽象层 + llama.cpp ARM交叉编译，x86开发ARM运行
+国产软硬件适配
+多Agent协作怎么不混乱
+Planner集中调度 + A2A协议标准化通信，职责边界清晰
+多智能体架构
 10.3 路线图（体现你有规模化复制思维）
 阶段1（MVP，2周）：单Agent + 文档问答 + 会议纪要提取，跑通核心链路。
 阶段2（完整闭环，2周）：加多Agent编排 + 反思机制 + 记忆系统 + 桌面操作。

@@ -133,9 +133,9 @@ def main() -> int:
         if mem.all_contacts():
             return
         for name, email, dept in [
-            ("张伟", "zhangwei@example.gov.cn", "综合办"),
-            ("李娜", "lina@example.gov.cn", "综合办"),
-            ("王强", "wangqiang@example.gov.cn", "技术科"),
+            ("张伟", "zhangwei@example.com", "综合办"),
+            ("李娜", "lina@example.com", "综合办"),
+            ("王强", "wangqiang@example.com", "技术科"),
         ]:
             mem.add_contact(name, email, dept)
 

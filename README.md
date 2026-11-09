@@ -5,13 +5,19 @@
 
 完整技术方案见 `docs/tech-plan.md`。
 
+> **项目状态（请先读）**：这是一个**阶段性 PoC**，不是已验收的交付系统。
+> 136 条离线断言全部使用脚本化 LLM 通过；**Ollama 与真实模型尚未安装，
+> 方案 8.2 的 7 项指标 0/7 实测**。下文表格里的 ✅ 表示模块已实现且可离线验证，
+> **不代表性能达标、也不代表真实模型链路已跑通**。
+> 完整差距见「当前缺失项」与「验收口径」两节。
+
 ## 快速体验（不需要装 Ollama）
 
 ```powershell
 .venv\Scripts\python.exe scripts\demo_offline.py      # 完整闭环演示，产出真实 Word/Excel 文件
 .venv\Scripts\python.exe tests\test_harness_offline.py  # 24 项
 .venv\Scripts\python.exe tests\test_pipeline_offline.py # 47 项
-.venv\Scripts\python.exe tests\test_eval_offline.py    # 61 项（只验证评测器逻辑，不产生指标实测值）
+.venv\Scripts\python.exe tests\test_eval_offline.py    # 65 项（只验证评测器逻辑，不产生指标实测值）
 ```
 
 演示用脚本化 LLM 模拟 Qwen2.5-7B 的 6 次调用（plan → map×2 → reduce → todos → email），

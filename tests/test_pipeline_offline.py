@@ -176,7 +176,7 @@ def test_reflection() -> None:
         subject="通知",
         body="各部门：现将部门例会纪要及待办事项清单印发给你们，请认真对照落实。"
              "本次会议明确了年底验收时间、功能冻结节点和预算报送要求，请各责任人按期完成任务并向办公室反馈办理情况。",
-        recipients=["李娜 <lina@example.gov.cn>"],
+        recipients=["李娜 <lina@example.com>"],
     )
     check("reflection：正常邮件通过", email_ok.passed, email_ok.text())
 
@@ -184,7 +184,7 @@ def test_reflection() -> None:
     check("reflection：无主题拦截", not email_bad.passed)
     check("reflection：收件人无邮箱拦截", any("有效邮箱" in i.detail for i in email_bad.errors))
 
-    secret = refl.check_email(subject="通知", body="各部门：现将纪要印发。联系人身份证号 110101199001011234，请按期落实。", recipients=["李娜 <lina@example.gov.cn>"])
+    secret = refl.check_email(subject="通知", body="各部门：现将纪要印发。联系人身份证号 110101199001011234，请按期落实。", recipients=["李娜 <lina@example.com>"])
     check("reflection：敏感信息告警", any(i.rule == "安全校验" for i in secret.issues))
 
 
@@ -199,7 +199,7 @@ def test_pipeline() -> None:
 
 
 def _run_pipeline_checks(reg: ToolRegistry, mem: StructuredMemory) -> None:
-        for n, e, d in [("李娜", "lina@example.gov.cn", "综合办"), ("王强", "wangqiang@example.gov.cn", "技术科")]:
+        for n, e, d in [("李娜", "lina@example.com", "综合办"), ("王强", "wangqiang@example.com", "技术科")]:
             mem.add_contact(n, e, d)
         check("memory：全体成员解析", len(mem.resolve_group("全体成员")) == 2)
         check("memory：按部门解析", len(mem.resolve_group("技术科")) == 1)

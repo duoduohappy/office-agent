@@ -1,7 +1,9 @@
-data/workspace/memory.sqlite3
+# 运行时产物（演示 / 评测 / 数据库）
+data/outbox/
+data/workspace/
+tests/_tmp_out/
+
+# Python 环境与缓存
+.venv/
 __pycache__/
 *.pyc
-tests/_tmp_out/
-data/outbox/demo_*/
-data/outbox/eval_*/
-data/workspace/eval.sqlite3

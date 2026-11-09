@@ -29,9 +29,9 @@ def main() -> int:
     registry = ToolRegistry().extend(file_tools.FILE_TOOLS).extend(doc_tools.DOC_TOOLS).extend(audio_tools.AUDIO_TOOLS)
     memory = StructuredMemory(config.memory_db)
     for name, email, dept in [
-        ("张伟", "zhangwei@example.gov.cn", "综合办"),
-        ("李娜", "lina@example.gov.cn", "综合办"),
-        ("王强", "wangqiang@example.gov.cn", "技术科"),
+        ("张伟", "zhangwei@example.com", "综合办"),
+        ("李娜", "lina@example.com", "综合办"),
+        ("王强", "wangqiang@example.com", "技术科"),
     ]:
         memory.add_contact(name, email, dept)
 
