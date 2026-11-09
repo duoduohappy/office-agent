@@ -62,6 +62,7 @@ def probe_tools(client: OllamaClient, schemas: list[dict], registry_names: set[s
         try:
             resp = client.chat(case["messages"], tools=schemas, temperature=0.0)
             elapsed = time.perf_counter() - t0
+            calls = resp.tool_calls
             names = [c.name for c in calls]
             row.update({
                 "elapsed_s": round(elapsed, 2),

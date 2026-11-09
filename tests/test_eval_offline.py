@@ -227,6 +227,27 @@ def test_memory_sampling() -> None:
     check("采样来源如实记录", "tasklist" in result["note"] or "/proc" in result["note"] or "未检测到" in result["note"])
 
 
+def test_process_name_matching() -> None:
+    """Ollama 各版本 runner 进程名不同；写死名单会漏掉真正加载权重的进程。"""
+    from unittest.mock import patch
+
+    from eval.metrics import _windows_process_rss, sample_gpu_vram_mb
+
+    fake = (b'"ollama.exe","38236","Console","1","61,560 K"\r\n'
+            b'"llama-server.exe","39528","Console","1","1,544,760 K"\r\n'
+            b'"python.exe","999","Console","1","20,000 K"\r\n')
+    with patch("eval.metrics.subprocess.run") as m:
+        m.return_value.stdout = fake
+        m.return_value.returncode = 0
+        total = _windows_process_rss({"ollama.exe"})
+        empty_names = _windows_process_rss(set())
+    # 61,560K + 1,544,760K = 1568.7MB；python.exe 不能被算进来
+    check("llama-server.exe 计入推理内存", 1560 < total < 1580, f"{total:.1f}MB")
+    check("前缀匹配不依赖写死名单", 1560 < empty_names < 1580, f"{empty_names:.1f}MB")
+    gpu, note = sample_gpu_vram_mb()
+    check("GPU 显存采样结构合法", gpu is None or gpu >= 0, f"{gpu} / {note}")
+
+
 def test_runner_guards() -> None:
     out = ROOT / "tests" / "_tmp_out" / "eval_runner"
     shutil.rmtree(out, ignore_errors=True)
@@ -283,6 +304,7 @@ def main() -> int:
     test_grade_task()
     test_aggregate()
     test_memory_sampling()
+    test_process_name_matching()
     test_runner_guards()
     test_report_no_absolute_paths()
     print(f"\n{'=' * 46}\n通过 {PASS} / 失败 {FAIL} / 共 {PASS + FAIL}")

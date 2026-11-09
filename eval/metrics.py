@@ -156,7 +156,14 @@ def _windows_process_rss(names: set[str]) -> float:
     total = 0.0
     for line in out.splitlines():
         parts = [p.strip(' "') for p in line.split('","')]
-        if len(parts) < 5 or parts[0].lower() not in names:
+        if len(parts) < 5:
+            continue
+        pname = parts[0].lower()
+        # Ollama 各版本的 runner 进程名不统一：ollama.exe（serve）、
+        # ollama_llama_server.exe（旧版）、llama-server.exe（v0.40.x）。
+        # 写死名单会漏掉真正加载权重的那个进程，把 serve 的 ~60MB
+        # 误报成「运行时内存峰值」——这是会伪造达标结论的错误。
+        if not (pname in names or pname.startswith("ollama") or "llama-server" in pname):
             continue
         try:
             total += float(parts[-1].replace(",", "").replace(".", "").replace(" K", "").strip()) / 1024
@@ -222,6 +229,38 @@ def _linux_ollama_rss_mb() -> float:
     return total
 
 
+def sample_gpu_vram_mb() -> tuple[float | None, str]:
+    """采样 NVIDIA 显存占用（MB）。无 GPU / 无驱动返回 (None, 原因)。
+
+    Ollama 在有独显的机器上会做 CPU/GPU 混合 offload，仅统计系统 RSS
+    会低估真实占用。显存单独记录、不混入「内存峰值」指标，但会在报告
+    note 中写明，避免把混合推理的结果当成纯 CPU 口径的成绩。
+    """
+    try:
+        proc = subprocess.run(
+            ["nvidia-smi", "--query-gpu=memory.used", "--format=csv,noheader,nounits"],
+            capture_output=True, timeout=5,
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+        )
+        if proc.returncode != 0:
+            return None, f"nvidia-smi 退出码 {proc.returncode}"
+        values = []
+        for line in proc.stdout.decode("utf-8", errors="replace").splitlines():
+            line = line.strip()
+            if line:
+                try:
+                    values.append(float(line))
+                except ValueError:
+                    continue
+        if not values:
+            return None, "nvidia-smi 未返回可读数值"
+        return sum(values), f"nvidia-smi，{len(values)} 张卡"
+    except FileNotFoundError:
+        return None, "无 NVIDIA 驱动 / nvidia-smi"
+    except Exception as exc:  # noqa: BLE001
+        return None, f"{type(exc).__name__}: {exc}"
+
+
 def sample_runtime_rss_mb() -> tuple[float | None, str, float]:
     """返回 (运行时总 RSS MB, 数据来源, Ollama 进程 RSS MB)。拿不到总量返回 None。"""
     try:
@@ -242,10 +281,18 @@ class MemorySampler:
         self.interval = interval
         self.peak_mb: float | None = None
         self.max_ollama_mb = 0.0
+        self.gpu_peak_mb: float | None = None
+        self.gpu_note = "未采样"
         self.source = "not_sampled"
         self.samples = 0
         self._stop = threading.Event()
         self._thread: threading.Thread | None = None
+
+    def _sample_gpu(self) -> None:
+        gpu_mb, gpu_note = sample_gpu_vram_mb()
+        if gpu_mb is not None:
+            self.gpu_peak_mb = gpu_mb if self.gpu_peak_mb is None else max(self.gpu_peak_mb, gpu_mb)
+        self.gpu_note = gpu_note
 
     def _poll(self) -> None:
         while not self._stop.is_set():
@@ -257,6 +304,7 @@ class MemorySampler:
                 self.samples += 1
             else:
                 self.source = source
+            self._sample_gpu()
             self._stop.wait(self.interval)
 
     def start(self) -> None:
@@ -275,19 +323,30 @@ class MemorySampler:
             self.max_ollama_mb = max(self.max_ollama_mb, ollama_mb)
             self.source = source
             self.samples += 1
+        self._sample_gpu()
+        gpu_field = round(self.gpu_peak_mb / 1024, 3) if self.gpu_peak_mb is not None else None
+        gpu_note = (f"GPU 显存峰值 {self.gpu_peak_mb:.0f}MB 未计入 RSS 指标"
+                    f"（{self.gpu_note}）；混合推理口径需在纯 CPU 环境复测"
+                    if self.gpu_peak_mb is not None else f"GPU 显存：{self.gpu_note}")
         if self.peak_mb is None:
-            return {"value_gb": None, "status": "unavailable", "note": self.source}
-        if self.max_ollama_mb <= 0:
-            # 只采到 Python 进程（~20MB）时标 0.02GB「达标」是自欺：模型根本没在推理。
+            return {"value_gb": None, "status": "unavailable", "note": self.source,
+                    "gpu_vram_peak_gb": gpu_field, "gpu_note": gpu_note}
+        if self.max_ollama_mb < 300:
+            # 只采到 serve 进程（~60MB）或仅 Python（~20MB）就报「0.1GB 达标」
+            # 是自欺：加载权重的 llama-server 根本没被计入。
             return {
                 "value_gb": None, "status": "unavailable",
-                "note": f"未检测到 Ollama 服务进程 RSS（{self.samples} 次采样，仅 Python {self.peak_mb:.0f}MB）；"
-                        "该值不能代表推理时内存峰值，故不计为实测",
+                "note": f"未检测到推理进程 RSS（{self.samples} 次采样，Ollama 系列峰值仅 "
+                        f"{self.max_ollama_mb:.0f}MB）；该值不能代表推理时内存峰值，故不计为实测",
+                "gpu_vram_peak_gb": gpu_field, "gpu_note": gpu_note,
             }
         return {
             "value_gb": round(self.peak_mb / 1024, 3),
             "status": "measured",
-            "note": f"{self.samples} 次采样；Ollama 峰值 {self.max_ollama_mb:.0f}MB；{self.source}",
+            "note": f"{self.samples} 次采样；Ollama 系列进程峰值 {self.max_ollama_mb:.0f}MB；"
+                    f"{self.source}；{gpu_note}",
+            "gpu_vram_peak_gb": gpu_field,
+            "gpu_note": gpu_note,
         }
 
 
